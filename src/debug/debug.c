@@ -4,7 +4,7 @@
 // Date:    2025-08-17
 
 #include "include/debug.h"
-#include "include/common.h"
+#include "include/bytecode.h"
 
 #include <stdio.h>
 
@@ -44,6 +44,8 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
     switch (instruction) {
         case OP_CONSTANT:
             return constant_instruction("OP_CONSTANT", bytecode, offset);
+        case OP_NEGATE:
+            return simple_instruction("OP_NEGATE", offset);
         case OP_RETURN:
             return simple_instruction("OP_RETURN", offset);
         default:

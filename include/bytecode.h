@@ -9,6 +9,13 @@
 #include "include/value.h"
 #include <stdint.h>
 
+/// OpCode represents a runtime bytecode instruction.
+typedef enum {
+    OP_CONSTANT, // Load constant.
+    OP_NEGATE,   // Negate an operand (2 -> -2)
+    OP_RETURN,   // Return from function call.
+} OpCode;
+
 /// Bytecode represents compiled bytecode instructions.
 typedef struct {
     int        count;     // The count of instructions in the code array.

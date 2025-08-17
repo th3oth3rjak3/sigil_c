@@ -5,8 +5,6 @@
 
 #pragma once
 
-/// OpCode represents a runtime bytecode instruction.
-typedef enum {
-    OP_CONSTANT, // Load constant.
-    OP_RETURN,   // Return from function call.
-} OpCode;
+#include <stdint.h>
+
+#define DEBUG_TRACE_EXECUTION
