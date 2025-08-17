@@ -1,10 +1,22 @@
-#include "common.h"
-#include "chunk.h"
-#include <stdio.h>
+#include "debug.h"
+#include "include/bytecode.h"
+#include "include/common.h"
+#include "include/memory.h"
 
-int main(void)
-{
-  Random thing = {.value = 1};
-  printf("Hello, value = %zu!\n", thing.value);
-  return 0;
+int
+main(void) {
+    Allocator alloc = get_debug_allocator();
+    Bytecode  code;
+
+    init_bytecode(&code);
+
+    int constant = write_constant(alloc, &code, 1.2);
+    write_bytecode(alloc, &code, OP_CONSTANT, 123);
+    write_bytecode(alloc, &code, constant, 123);
+
+    write_bytecode(alloc, &code, OP_RETURN, 123);
+    disassemble_bytecode(&code, "test bytecode");
+    free_bytecode(alloc, &code);
+
+    alloc.report_statistics();
 }

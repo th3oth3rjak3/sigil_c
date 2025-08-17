@@ -1,0 +1,24 @@
+# Based on your existing config with fixes:
+AlignConsecutiveDeclarations: true
+AlignTrailingComments: true
+AlignAfterOpenBracket: AlwaysBreak     # ← Critical change
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterDefinitionReturnType: All
+AlwaysBreakAfterReturnType: All
+BinPackArguments: false              # ← New
+BinPackParameters: false             # ← New
+BreakBeforeBinaryOperators: NonAssignment
+ContinuationIndentWidth: 4
+IndentCaseLabels: true
+IndentWidth: 4
+MaxEmptyLinesToKeep: 1
+PointerAlignment: Left
+ReflowComments: true
+SortIncludes: true
+SortUsingDeclarations: true
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+TabWidth: 4
+UseTab: Never

@@ -3,23 +3,14 @@
 BUILD_DIR=build
 EXECUTABLE=sigil   # change as needed
 
-VERBOSE=0
-if [[ "$2" == "--verbose" ]]; then
-  VERBOSE=1
-fi
-
 function configure_build() {
   echo "Configuring build..."
-  cmake -S . -B "$BUILD_DIR"
+  meson setup "$BUILD_DIR"
 }
 
 function build_project() {
   echo "Building project..."
-  if [ $VERBOSE -eq 1 ]; then
-    cmake --build "$BUILD_DIR" --verbose
-  else
-    cmake --build "$BUILD_DIR"
-  fi
+  meson compile -C "$BUILD_DIR" --verbose
 }
 
 function clean_build() {
