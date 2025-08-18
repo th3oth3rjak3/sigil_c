@@ -62,7 +62,9 @@ typedef struct {
 #define FREE_ARRAY(allocator, type, pointer, old_count)                        \
     (FREE_WITH(allocator, type, pointer, old_count))
 
+/// A global allocator for managing memory.
 extern const Allocator GlobalAllocator;
 
+/// Free all objects that were allocated.
 void
-free_objects();
+free_objects(void);

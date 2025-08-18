@@ -16,11 +16,12 @@
 #include "debug.h"
 #endif
 
+/// Parser handles precedence parsing of tokens into bytecode.
 typedef struct {
-    Token current;
-    Token previous;
-    bool  had_error;
-    bool  panic_mode;
+    Token current;    // The current token.
+    Token previous;   // The previous token.
+    bool  had_error;  // True when an error has occurred during parsing.
+    bool  panic_mode; // True when syncrhonization is necessary.
 } Parser;
 
 typedef enum {
@@ -37,15 +38,20 @@ typedef enum {
     PREC_PRIMARY
 } Precedence;
 
+/// A function that is used to parse tokens.
 typedef void (*ParseFn)();
 
+/// ParseRule contains parsing hierarchy for each token type.
 typedef struct {
-    ParseFn    prefix;
-    ParseFn    infix;
-    Precedence precedence;
+    ParseFn    prefix;     // A prefix function (eg, unary) or null
+    ParseFn    infix;      // An infix function (eg, binary) or null
+    Precedence precedence; // Parsing precedence
 } ParseRule;
 
-Parser    parser;
+/// The global parser.
+Parser parser;
+
+/// The currently compiling bytecode segment.
 Bytecode* compiling_bytecode;
 
 static void

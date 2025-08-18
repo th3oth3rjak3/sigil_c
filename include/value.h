@@ -29,18 +29,37 @@ typedef struct {
     } as;
 } Value;
 
+// Check if value is a boolean.
 #define IS_BOOL(value) ((value).type == VAL_BOOL)
+
+// Check if value is nil.
 #define IS_NIL(value) ((value).type == VAL_NIL)
+
+// Check if value is a number.
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)
+
+// Check if value is an object.
 #define IS_OBJ(value) ((value).type == VAL_OBJ)
 
+// Read value as boolean.
 #define AS_BOOL(value) ((value).as.boolean)
+
+// Read value as number.
 #define AS_NUMBER(value) ((value).as.number)
+
+// Read value as an object.
 #define AS_OBJ(value) ((value).as.obj)
 
+// Create a boolean value
 #define BOOL_VAL(value) ((Value){VAL_BOOL, {.boolean = value}})
+
+// Create a nil value
 #define NIL_VAL ((Value){VAL_NIL, {.number = 0}})
+
+// Create a number value
 #define NUMBER_VAL(value) ((Value){VAL_NUMBER, {.number = value}})
+
+// Create an object value
 #define OBJ_VAL(object) ((Value){VAL_OBJ, {.obj = (Obj*)object}})
 
 /// ValueArray is a dynamic array that contains runtime Values.

@@ -168,7 +168,7 @@ free_object(Obj* object) {
 }
 
 void
-free_objects() {
+free_objects(void) {
     Obj* object = vm.objects;
     while (object != NULL) {
         Obj* next = object->next;
