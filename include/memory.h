@@ -62,10 +62,4 @@ typedef struct {
 #define FREE_ARRAY(allocator, type, pointer, old_count)                        \
     (FREE_WITH(allocator, type, pointer, old_count))
 
-/// Get a system allocator used for release mode.
-Allocator
-get_system_allocator(void);
-
-/// Get a debug allocator used for debugging purposes.
-Allocator
-get_debug_allocator(void);
+extern const Allocator GlobalAllocator;

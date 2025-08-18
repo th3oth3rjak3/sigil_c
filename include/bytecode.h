@@ -5,13 +5,16 @@
 
 #pragma once
 
-#include "include/memory.h"
 #include "include/value.h"
 #include <stdint.h>
 
 /// OpCode represents a runtime bytecode instruction.
 typedef enum {
     OP_CONSTANT, // Load constant.
+    OP_ADD,      // Add two operands.
+    OP_SUBTRACT, // Subtract two operands.
+    OP_MULTIPLY, // Multiply two operands.
+    OP_DIVIDE,   // Divide two operands.
     OP_NEGATE,   // Negate an operand (2 -> -2)
     OP_RETURN,   // Return from function call.
 } OpCode;
@@ -35,29 +38,25 @@ init_bytecode(Bytecode* bytecode);
 /// Free the resources for the bytecode structure.
 ///
 /// Params:
-/// - allocator: The allocator to use for freeing.
 /// - bytecode: The bytecode structure to free.
 void
-free_bytecode(Allocator allocator, Bytecode* bytecode);
+free_bytecode(Bytecode* bytecode);
 
 /// Write some operation to the bytecode.
 ///
 /// Params:
-/// - allocator: The allocator used for managing memory operations.
 /// - bytecode: The bytecode structure to write the operation to.
 /// - word: The 16 bit unsigned integer to write to the bytecode.
 void
-write_bytecode(
-    Allocator allocator, Bytecode* bytecode, uint16_t word, int line);
+write_bytecode(Bytecode* bytecode, uint16_t word, int line);
 
 /// Write a copmile time constant value to the bytecode constants array.
 ///
 /// Params:
-/// - allocator: The allocator needed to allocate additional memory.
 /// - bytecode: The bytecode structure to write the constant value to.
 /// - value: The value to write to the bytecode constants array.
 ///
 /// Returns:
 /// - int: The index of the added constant.
 int
-write_constant(Allocator allocator, Bytecode* bytecode, Value value);
+write_constant(Bytecode* bytecode, Value value);

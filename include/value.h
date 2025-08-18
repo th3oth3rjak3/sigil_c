@@ -5,8 +5,6 @@
 
 #pragma once
 
-#include "memory.h"
-
 /// Value is the runtime type in the virtual machine stack.
 typedef double Value;
 
@@ -27,19 +25,17 @@ init_value_array(ValueArray* array);
 /// Write a value to the value array.
 ///
 /// Params:
-/// - allocator: The allocator for memory allocation when needed.
 /// - array: The array to write to.
 /// - value: The value to write into the array.
 void
-write_value_array(Allocator allocator, ValueArray* array, Value value);
+write_value_array(ValueArray* array, Value value);
 
 /// Free all of the values in the array.
 ///
 /// Params:
-/// - allocator: The allocator used to free the values.
 /// - array: The array to free.
 void
-free_value_array(Allocator allocator, ValueArray* array);
+free_value_array(ValueArray* array);
 
 /// Print a value to standard out.
 ///

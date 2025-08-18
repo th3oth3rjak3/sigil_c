@@ -6,7 +6,6 @@
 #pragma once
 
 #include "bytecode.h"
-#include "memory.h"
 
 #define STACK_MAX 256
 
@@ -26,45 +25,33 @@ typedef struct {
 } VM;
 
 /// Initialize the virtual machine.
-///
-/// Params:
-/// - allocator: The allocator used to initialize the vm.
-/// - vm: The virtual machine to initialize.
 void
-init_vm(Allocator allocator, VM* vm);
+init_vm();
 
 /// Free virtual machine resources.
-///
-/// Params:
-/// - allocator: The allocator used to free.
-/// - vm: The virtual machine to free.
 void
-free_vm(Allocator allocator, VM* vm);
+free_vm();
 
 /// Interpret the bytecode.
 ///
 /// Params:
-/// - bytecode: The bytecode to interpret.
+/// - source: The source code to interpret.
 ///
 /// Returns:
 /// - InterpretResult: The result of intrpreting the bytecode.
 InterpretResult
-interpret(VM* vm, Bytecode* bytecode);
+interpret(const char* source);
 
 /// Push a new value to the top of the virtual machine stack.
 ///
 /// Params:
-/// - vm: The virtual machine.
 /// _ value: The value to push onto the vm stack.
 void
-push(VM* vm, Value value);
+push(Value value);
 
 /// Pop a value off of the virtual machine stack.
-///
-/// Params:
-/// - vm: The virtual machine to pop the value from.
 ///
 /// Returns:
 /// - Value: The value popped off the stack.
 Value
-pop(VM* vm);
+pop();

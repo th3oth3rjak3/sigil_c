@@ -4,6 +4,7 @@
 // Date:    2025-08-17
 
 #include "include/memory.h"
+#include "include/common.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,17 +39,12 @@ system_report_statistics(void) {}
 /* ======================== Global System Allocator ========================= */
 
 // Get the default libc system allocator.
-Allocator
-get_system_allocator(void) {
-    Allocator alloc = {
-        .alloc = system_alloc,
-        .free = system_free,
-        .realloc = system_realloc,
-        .report_statistics = system_report_statistics,
-    };
-
-    return alloc;
-}
+const Allocator GlobalSystemAllocator = {
+    .alloc = system_alloc,
+    .free = system_free,
+    .realloc = system_realloc,
+    .report_statistics = system_report_statistics,
+};
 
 /* ======================= Debug Allocator Interface ======================== */
 
@@ -103,11 +99,16 @@ debug_realloc(void* ptr, size_t old_size, size_t new_size) {
     }
 
     // Update statistics
-    total_allocated += new_size;
+    total_allocated = total_allocated - old_size + new_size;
     if (total_allocated > peak_allocated) {
         peak_allocated = total_allocated;
     }
     alloc_count++;
+
+    if (ptr != NULL) {
+        free_count++;
+    }
+
     printf(
         "%p (new: %zu) | Total: %zu bytes\n",
         new_ptr,
@@ -134,14 +135,18 @@ debug_report_statistics(void) {
 /* ========================= Global Debug Allocator ========================= */
 
 // Get a debug allocator for debugging.
-Allocator
-get_debug_allocator(void) {
-    Allocator alloc = {
-        .alloc = debug_alloc,
-        .free = debug_free,
-        .realloc = debug_realloc,
-        .report_statistics = debug_report_statistics,
-    };
 
-    return alloc;
-}
+const Allocator GlobalDebugAllocator = {
+    .alloc = debug_alloc,
+    .free = debug_free,
+    .realloc = debug_realloc,
+    .report_statistics = debug_report_statistics,
+};
+
+/* ======================= Global Allocator Instance ======================== */
+
+#ifdef DEBUG_PRINT_ALLOCATIONS
+const Allocator GlobalAllocator = GlobalDebugAllocator;
+#else
+const Allocator GlobalAllocator = GlobalSystemAllocator;
+#endif
