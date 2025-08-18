@@ -3,9 +3,14 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <signal.h>
+#endif
+
 #include "include/memory.h"
 #include "include/vm.h"
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,12 +20,10 @@ repl() {
     char line[1024];
     for (;;) {
         printf("> ");
-
         if (!fgets(line, sizeof(line), stdin)) {
             printf("\n");
             break;
         }
-
         interpret(line);
     }
 }
@@ -32,28 +35,21 @@ read_file(const char* path, size_t* out_size) {
         fprintf(stderr, "Could not open file \"%s\".\n", path);
         exit(74);
     }
-
     fseek(file, 0L, SEEK_END);
     size_t fileSize = ftell(file);
-
     rewind(file);
-
     char* buffer = (char*)GlobalAllocator.alloc(fileSize + 1);
     if (buffer == NULL) {
         fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
         exit(74);
     }
-
     size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
     if (bytesRead < fileSize) {
         fprintf(stderr, "Could not read file \"%s\".\n", path);
         exit(74);
     }
-
     buffer[bytesRead] = '\0';
-
     fclose(file);
-
     *out_size = fileSize + 1;
     return buffer;
 }
@@ -64,7 +60,6 @@ run_file(const char* path) {
     char*           source = read_file(path, &size);
     InterpretResult result = interpret(source);
     GlobalAllocator.free(source, size);
-
     if (result == INTERPRET_COMPILE_ERROR)
         exit(65);
     if (result == INTERPRET_RUNTIME_ERROR)
@@ -72,19 +67,42 @@ run_file(const char* path) {
 }
 
 void
-handle_sigint(int sig) {
+handle_interrupt() {
     free_vm();
     GlobalAllocator.report_statistics();
     exit(0);
 }
 
+#ifdef _WIN32
+BOOL WINAPI
+ctrl_handler(DWORD ctrl_type) {
+    if (ctrl_type == CTRL_C_EVENT) {
+        handle_interrupt();
+        return TRUE;
+    }
+    return FALSE;
+}
+
+void
+setup_interrupt_handler() {
+    SetConsoleCtrlHandler(ctrl_handler, TRUE);
+}
+
+#else
+void
+sigint_handler(int sig) {
+    handle_interrupt();
+}
+
+void
+setup_interrupt_handler() {
+    signal(SIGINT, sigint_handler);
+}
+#endif
+
 int
 main(int argc, const char* argv[]) {
-    if (signal(SIGINT, handle_sigint) == SIG_ERR) {
-        perror("signal");
-        return 1;
-    }
-
+    setup_interrupt_handler();
     init_vm();
 
     if (argc == 1) {
@@ -96,5 +114,5 @@ main(int argc, const char* argv[]) {
         exit(64);
     }
 
-    free_vm();
+    return 0;
 }
