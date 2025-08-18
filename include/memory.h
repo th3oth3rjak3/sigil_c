@@ -63,3 +63,6 @@ typedef struct {
     (FREE_WITH(allocator, type, pointer, old_count))
 
 extern const Allocator GlobalAllocator;
+
+void
+free_objects();

@@ -22,7 +22,10 @@ typedef struct {
     uint16_t* ip;               // The instruction pointer.
     Value     stack[STACK_MAX]; // The virtual machine stack.
     Value*    stack_top;        // The pointer to the top of the stack.
+    Obj*      objects;          // The list of allocated objects on the heap.
 } VM;
+
+extern VM vm;
 
 /// Initialize the virtual machine.
 void

@@ -26,7 +26,7 @@ repl() {
 }
 
 static char*
-read_file(const char* path) {
+read_file(const char* path, size_t* out_size) {
     FILE* file = fopen(path, "rb");
     if (file == NULL) {
         fprintf(stderr, "Could not open file \"%s\".\n", path);
@@ -35,6 +35,7 @@ read_file(const char* path) {
 
     fseek(file, 0L, SEEK_END);
     size_t fileSize = ftell(file);
+
     rewind(file);
 
     char* buffer = (char*)GlobalAllocator.alloc(fileSize + 1);
@@ -52,14 +53,17 @@ read_file(const char* path) {
     buffer[bytesRead] = '\0';
 
     fclose(file);
+
+    *out_size = fileSize + 1;
     return buffer;
 }
 
 static void
 run_file(const char* path) {
-    char*           source = read_file(path);
+    size_t          size;
+    char*           source = read_file(path, &size);
     InterpretResult result = interpret(source);
-    GlobalAllocator.free(source, (size_t)strlen(source));
+    GlobalAllocator.free(source, size);
 
     if (result == INTERPRET_COMPILE_ERROR)
         exit(65);
@@ -69,6 +73,7 @@ run_file(const char* path) {
 
 void
 handle_sigint(int sig) {
+    free_vm();
     GlobalAllocator.report_statistics();
     exit(0);
 }

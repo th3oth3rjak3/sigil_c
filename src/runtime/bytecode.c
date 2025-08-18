@@ -4,8 +4,8 @@
 // Date:    2025-08-17
 
 #include "include/bytecode.h"
-#include "memory.h"
-#include "value.h"
+#include "include/memory.h"
+#include "include/value.h"
 #include <stdint.h>
 #include <stdio.h>
 
