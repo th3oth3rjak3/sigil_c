@@ -4,5 +4,6 @@
         "*.lalrpop": "lalrpop",
         "string.h": "c",
         "memory.h": "c"
-    }
+    },
+    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
 }

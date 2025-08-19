@@ -3,17 +3,17 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "include/bytecode.h"
-#include "include/common.h"
-#include "include/object.h"
-#include "include/scanner.h"
-#include "include/value.h"
+#include "src/common.h"
+#include "src/runtime/bytecode.h"
+#include "src/scanner/scanner.h"
+#include "src/types/object.h"
+#include "src/types/value.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef DEBUG_PRINT_CODE
-#include "debug.h"
+#include "src/debug/debug.h"
 #endif
 
 /// Parser handles precedence parsing of tokens into bytecode.

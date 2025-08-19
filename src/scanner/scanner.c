@@ -3,7 +3,7 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "include/scanner.h"
+#include "src/scanner/scanner.h"
 #include <stdbool.h>
 #include <string.h>
 

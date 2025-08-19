@@ -1,6 +1,16 @@
 project('sigil', 'c', version: '0.0.1')
 
-includes = include_directories(['include'])
+includes = include_directories(
+  [
+    'src/compiler',
+    'src/debug',
+    'src/error_handling',
+    'src/memory',
+    'src/runtime',
+    'src/scanner',
+    'src/types',
+  ],
+)
 
 lib_sources = [
   'src/compiler/compiler.c',

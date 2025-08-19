@@ -3,9 +3,9 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "include/value.h"
-#include "include/memory.h"
-#include "include/object.h"
+#include "src/types/value.h"
+#include "src/memory/memory.h"
+#include "src/types/object.h"
 #include <stdio.h>
 #include <string.h>
 

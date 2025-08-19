@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "include/value.h"
+#include "src/types/value.h"
 #include <stdint.h>
 
 /// OpCode represents a runtime bytecode instruction.

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "value.h"
+#include "src/types/value.h"
 
 // Get the type of the object.
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
@@ -33,9 +33,10 @@ struct Obj {
 
 /// A string representation.
 struct ObjString {
-    Obj   obj;    // The object header.
-    int   length; // The number of characters
-    char* chars;  // The pointer to the string contents.
+    Obj      obj;    // The object header.
+    int      length; // The number of characters
+    char*    chars;  // The pointer to the string contents.
+    uint32_t hash;   // The precomputed hash for the string.
 };
 
 /// Create a deep copy of the string.

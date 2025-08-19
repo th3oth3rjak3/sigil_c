@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "bytecode.h"
+#include "src/runtime/bytecode.h"
 
 #define STACK_MAX 256
 

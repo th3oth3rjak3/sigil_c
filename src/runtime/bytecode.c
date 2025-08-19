@@ -3,9 +3,9 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "include/bytecode.h"
-#include "include/memory.h"
-#include "include/value.h"
+#include "src/runtime/bytecode.h"
+#include "src/memory/memory.h"
+#include "src/types/value.h"
 #include <stdint.h>
 #include <stdio.h>
 

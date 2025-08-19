@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "bytecode.h"
+#include "src/runtime/bytecode.h"
 #include <stdbool.h>
 
 /// Compile the source code into a bytecode structure.

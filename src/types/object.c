@@ -1,13 +1,23 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "include/memory.h"
-#include "include/object.h"
-#include "include/value.h"
-#include "include/vm.h"
+#include "src/memory/memory.h"
+#include "src/runtime/vm.h"
+#include "src/types/object.h"
+#include "src/types/value.h"
 
 #define ALLOCATE_OBJ(type, objectType)                                         \
     (type*)allocate_object(sizeof(type), objectType)
+
+static uint32_t
+hash_string(const char* key, int length) {
+    uint32_t hash = 2166136261u;
+    for (int i = 0; i < length; i++) {
+        hash ^= (uint8_t)key[i];
+        hash *= 16777619;
+    }
+    return hash;
+}
 
 static Obj*
 allocate_object(size_t size, ObjType type) {
@@ -20,24 +30,27 @@ allocate_object(size_t size, ObjType type) {
 }
 
 static ObjString*
-allocate_string(char* chars, int length) {
+allocate_string(char* chars, int length, uint32_t hash) {
     ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
     string->length = length;
     string->chars = chars;
+    string->hash = hash;
     return string;
 }
 
 ObjString*
 copy_string(const char* chars, int length) {
-    char* heapChars = ALLOC_WITH(GlobalAllocator, char, length + 1);
+    uint32_t hash = hash_string(chars, length);
+    char*    heapChars = ALLOC_WITH(GlobalAllocator, char, length + 1);
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
-    return allocate_string(heapChars, length);
+    return allocate_string(heapChars, length, hash);
 }
 
 ObjString*
 take_string(char* chars, int length) {
-    return allocate_string(chars, length);
+    uint32_t hash = hash_string(chars, length);
+    return allocate_string(chars, length, hash);
 }
 
 void
