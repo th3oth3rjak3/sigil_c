@@ -6,6 +6,7 @@
 #pragma once
 
 #include "src/types/value.h"
+#include <stdint.h>
 
 // Get the type of the object.
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)

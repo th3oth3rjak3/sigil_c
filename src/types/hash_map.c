@@ -7,6 +7,7 @@
 #include "src/memory/memory.h"
 #include "src/types/object.h"
 #include "src/types/value.h"
+#include <string.h>
 
 #define TABLE_MAX_LOAD 0.75
 
@@ -58,6 +59,7 @@ adjust_capacity(HashMap* hash_map, int capacity) {
         new_entries[i].value = NIL_VAL;
     }
 
+    hash_map->count = 0;
     for (int i = 0; i < hash_map->capacity; i++) {
         // Existing value to copy
         Entry* entry = &hash_map->entries[i];
@@ -68,6 +70,7 @@ adjust_capacity(HashMap* hash_map, int capacity) {
         Entry* dest = find_entry(new_entries, capacity, entry->key);
         dest->key = entry->key;
         dest->value = entry->value;
+        hash_map->count++;
     }
 
     FREE_ARRAY(GlobalAllocator, Entry, hash_map->entries, hash_map->capacity);
@@ -94,7 +97,7 @@ hashmap_set(HashMap* hash_map, ObjString* key, Value value) {
 
     Entry* entry = find_entry(hash_map->entries, hash_map->capacity, key);
     bool   is_new = entry->key == NULL;
-    if (is_new)
+    if (is_new && IS_NIL(entry->value))
         hash_map->count++;
 
     entry->key = key;
@@ -127,4 +130,29 @@ hashmap_delete(HashMap* hash_map, ObjString* key) {
     entry->key = NULL;
     entry->value = BOOL_VAL(true);
     return true;
+}
+
+ObjString*
+hashmap_find_string(
+    HashMap* hash_map, const char* chars, int length, uint32_t hash) {
+    if (hash_map->count == 0) {
+        return NULL;
+    }
+
+    uint32_t index = hash % hash_map->capacity;
+    for (;;) {
+        Entry* entry = &hash_map->entries[index];
+        if (entry->key == NULL) {
+            // Stop if we find an empty non-tombstone entry.
+            if (IS_NIL(entry->value))
+                return NULL;
+        } else if (
+            entry->key->length == length && entry->key->hash == hash
+            && memcmp(entry->key->chars, chars, length) == 0) {
+            // We found it!
+            return entry->key;
+        }
+
+        index = (index + 1) % hash_map->capacity;
+    }
 }

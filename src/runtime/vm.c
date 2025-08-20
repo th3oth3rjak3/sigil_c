@@ -8,6 +8,7 @@
 #include "src/compiler/compiler.h"
 #include "src/debug/debug.h"
 #include "src/memory/memory.h"
+#include "src/types/hash_map.h"
 #include "src/types/object.h"
 #include "src/types/value.h"
 
@@ -78,10 +79,12 @@ void
 init_vm() {
     reset_stack();
     vm.objects = NULL;
+    init_hashmap(&vm.strings);
 }
 
 void
 free_vm() {
+    free_hashmap(&vm.strings);
     free_objects();
 }
 

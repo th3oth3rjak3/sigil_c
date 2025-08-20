@@ -6,6 +6,7 @@
 #pragma once
 
 #include "src/runtime/bytecode.h"
+#include "src/types/hash_map.h"
 
 #define STACK_MAX 256
 
@@ -23,6 +24,7 @@ typedef struct {
     Value     stack[STACK_MAX]; // The virtual machine stack.
     Value*    stack_top;        // The pointer to the top of the stack.
     Obj*      objects;          // The list of allocated objects on the heap.
+    HashMap   strings;          // The collection of interned strings.
 } VM;
 
 extern VM vm;

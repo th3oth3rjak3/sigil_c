@@ -79,3 +79,17 @@ hashmap_delete(HashMap* hash_map, ObjString* key);
 /// - dest: The destination map.
 void
 hashmap_copy_all(HashMap* source, HashMap* dest);
+
+/// Look up a string object key in the hash map.
+///
+/// Params:
+/// - hash_map: The hash map that contains the string.
+/// - chars: The string contents.
+/// - length: The length of the string.
+/// - hash: The hash of the string.
+///
+/// Returns:
+/// - ObjString*: The pointer to the string value when found.
+ObjString*
+hashmap_find_string(
+    HashMap* hash_map, const char* chars, int length, uint32_t hash);
