@@ -9,6 +9,7 @@
 #include "src/types/object.h"
 #include "src/types/value.h"
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -151,6 +152,17 @@ static void
 emit_words(uint16_t word1, uint16_t word2) {
     emit_word(word1);
     emit_word(word2);
+}
+
+static void
+emit_loop(int loop_start) {
+    emit_word(OP_LOOP);
+
+    int offset = current_bytecode()->count - loop_start + 1;
+    if (offset > UINT16_MAX)
+        error("Loop body too large.");
+
+    emit_word(offset & 0xffff);
 }
 
 static int
@@ -363,6 +375,16 @@ define_variable(uint16_t global) {
 }
 
 static void
+and_(bool can_assign) {
+    int end_jump = emit_jump(OP_JUMP_IF_FALSE);
+
+    emit_word(OP_POP);
+    parse_precedence(PREC_AND);
+
+    patch_jump(end_jump);
+}
+
+static void
 expression() {
     parse_precedence(PREC_ASSIGNMENT);
 }
@@ -398,19 +420,65 @@ expression_statement() {
 }
 
 static void
+for_statement() {
+    begin_scope();
+    consume(TOKEN_LEFT_PAREN, "Expect '(' after 'for'.");
+    if (match(TOKEN_SEMICOLON)) {
+        // no initializer present
+    } else if (match(TOKEN_VAR)) {
+        var_declaration();
+    } else {
+        expression_statement();
+    }
+
+    int loop_start = current_bytecode()->count;
+    int exit_jump = -1;
+    if (!match(TOKEN_SEMICOLON)) {
+        expression();
+        consume(TOKEN_SEMICOLON, "Expect ';' after loop condition.");
+
+        // jump out if condition is false.
+        exit_jump = emit_jump(OP_JUMP_IF_FALSE);
+        emit_word(OP_POP); // remove the condition
+    }
+
+    if (!match(TOKEN_RIGHT_PAREN)) {
+        int body_jump = emit_jump(OP_JUMP);
+        int increment_start = current_bytecode()->count;
+        expression();
+        emit_word(OP_POP);
+        consume(TOKEN_RIGHT_PAREN, "Expect ')' after for clauses.");
+
+        emit_loop(loop_start);
+        loop_start = increment_start;
+        patch_jump(body_jump);
+    }
+
+    statement();
+    emit_loop(loop_start);
+
+    if (exit_jump != -1) {
+        patch_jump(exit_jump);
+        emit_word(OP_POP);
+    }
+
+    end_scope();
+}
+
+static void
 if_statement() {
     consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
     expression();
     consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
 
     int then_jump = emit_jump(OP_JUMP_IF_FALSE);
-    // emit_word(OP_POP);
+    emit_word(OP_POP);
     statement();
 
     int else_jump = emit_jump(OP_JUMP);
 
     patch_jump(then_jump);
-    // emit_word(OP_POP);
+    emit_word(OP_POP);
 
     if (match(TOKEN_ELSE)) {
         statement();
@@ -424,6 +492,22 @@ print_statement() {
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after value.");
     emit_word(OP_PRINT);
+}
+
+static void
+while_statement() {
+    int loop_start = current_bytecode()->count;
+    consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
+
+    int exit_jump = emit_jump(OP_JUMP_IF_FALSE);
+    emit_word(OP_POP);
+    statement();
+    emit_loop(loop_start);
+
+    patch_jump(exit_jump);
+    emit_word(OP_POP);
 }
 
 static void
@@ -457,6 +541,10 @@ statement() {
         print_statement();
     } else if (match(TOKEN_IF)) {
         if_statement();
+    } else if (match(TOKEN_WHILE)) {
+        while_statement();
+    } else if (match(TOKEN_FOR)) {
+        for_statement();
     } else if (match(TOKEN_LEFT_BRACE)) {
         begin_scope();
         block();
@@ -488,6 +576,18 @@ static void
 number(bool can_assign) {
     double value = strtod(parser.previous.start, NULL);
     emit_constant(NUMBER_VAL(value));
+}
+
+static void
+or_(bool can_assign) {
+    int else_jump = emit_jump(OP_JUMP_IF_FALSE);
+    int end_jump = emit_jump(OP_JUMP);
+
+    patch_jump(else_jump);
+    emit_word(OP_POP);
+
+    parse_precedence(PREC_OR);
+    patch_jump(end_jump);
 }
 
 static void
@@ -625,7 +725,7 @@ ParseRule rules[] = {
     [TOKEN_IDENTIFIER] = {variable, NULL, PREC_NONE},
     [TOKEN_STRING] = {string, NULL, PREC_NONE},
     [TOKEN_NUMBER] = {number, NULL, PREC_NONE},
-    [TOKEN_AND] = {NULL, NULL, PREC_NONE},
+    [TOKEN_AND] = {NULL, and_, PREC_AND},
     [TOKEN_CLASS] = {NULL, NULL, PREC_NONE},
     [TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
     [TOKEN_FALSE] = {literal, NULL, PREC_NONE},
@@ -633,7 +733,7 @@ ParseRule rules[] = {
     [TOKEN_FUN] = {NULL, NULL, PREC_NONE},
     [TOKEN_IF] = {NULL, NULL, PREC_NONE},
     [TOKEN_NIL] = {literal, NULL, PREC_NONE},
-    [TOKEN_OR] = {NULL, NULL, PREC_NONE},
+    [TOKEN_OR] = {NULL, or_, PREC_OR},
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
     [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
     [TOKEN_SUPER] = {NULL, NULL, PREC_NONE},

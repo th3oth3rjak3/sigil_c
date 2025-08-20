@@ -32,6 +32,7 @@ typedef enum {
     OP_PRINT,         // Print to the console.
     OP_JUMP,          // Jump unconditionally.
     OP_JUMP_IF_FALSE, // Jump if the condition is false.
+    OP_LOOP,          // Loop instruction
     OP_RETURN,        // Return from function call.
 } OpCode;
 

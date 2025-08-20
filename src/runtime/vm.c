@@ -236,7 +236,11 @@ run() {
                 if (is_falsey(peek(0))) {
                     vm.ip += offset;
                 }
-                pop();
+                break;
+            }
+            case OP_LOOP: {
+                uint16_t offset = READ_WORD();
+                vm.ip -= offset;
                 break;
             }
             case OP_RETURN: {
