@@ -30,6 +30,8 @@ typedef enum {
     OP_NOT,           // Logical Negation (!true -> false)
     OP_NEGATE,        // Negate an operand (2 -> -2)
     OP_PRINT,         // Print to the console.
+    OP_JUMP,          // Jump unconditionally.
+    OP_JUMP_IF_FALSE, // Jump if the condition is false.
     OP_RETURN,        // Return from function call.
 } OpCode;
 

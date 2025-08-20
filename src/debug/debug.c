@@ -22,6 +22,13 @@ word_instruction(const char* name, Bytecode* bytecode, int offset) {
 }
 
 static int
+jump_instruction(const char* name, int sign, Bytecode* bytecode, int offset) {
+    uint16_t jump = bytecode->code[offset + 1];
+    printf("%-16s %4d -> %d\n", name, offset, offset + 2 + sign * jump);
+    return offset + 2;
+}
+
+static int
 constant_instruction(const char* name, Bytecode* bytecode, int offset) {
     uint8_t constant = bytecode->code[offset + 1];
     printf("%-16s %4d '", name, constant);
@@ -89,6 +96,10 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return simple_instruction("OP_NEGATE", offset);
         case OP_PRINT:
             return simple_instruction("OP_PRINT", offset);
+        case OP_JUMP:
+            return jump_instruction("OP_JUMP", 1, bytecode, offset);
+        case OP_JUMP_IF_FALSE:
+            return jump_instruction("OP_JUMP_IF_FALSE", 1, bytecode, offset);
         case OP_RETURN:
             return simple_instruction("OP_RETURN", offset);
         default:

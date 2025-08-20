@@ -15,6 +15,7 @@
 
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -222,6 +223,20 @@ run() {
             case OP_PRINT: {
                 print_value(pop());
                 printf("\n");
+                break;
+            }
+            case OP_JUMP: {
+                uint16_t offset = READ_WORD();
+                vm.ip += offset;
+                break;
+            }
+            case OP_JUMP_IF_FALSE: {
+                // DANGER: potential source of errors
+                uint16_t offset = READ_WORD();
+                if (is_falsey(peek(0))) {
+                    vm.ip += offset;
+                }
+                pop();
                 break;
             }
             case OP_RETURN: {

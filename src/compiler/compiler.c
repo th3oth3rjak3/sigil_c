@@ -153,6 +153,16 @@ emit_words(uint16_t word1, uint16_t word2) {
     emit_word(word2);
 }
 
+static int
+emit_jump(uint16_t instruction) {
+    emit_word(instruction);
+    emit_word(0xffff);
+    // Diverges from the book, we only go back one since we only add one
+    // additional word instruction instead of two byte instructions
+    // DANGER: potential source of errors
+    return current_bytecode()->count - 1;
+}
+
 static uint16_t
 make_constant(Value value) {
     int constant = write_constant(current_bytecode(), value);
@@ -167,6 +177,19 @@ make_constant(Value value) {
 static void
 emit_constant(Value value) {
     emit_words(OP_CONSTANT, make_constant(value));
+}
+
+static void
+patch_jump(int offset) {
+    // diverges from book, only use -1 since the word is only one instruction.
+    // DANGER: potential source of errors
+    int jump = current_bytecode()->count - offset - 1;
+    if (jump > UINT16_MAX) {
+        error("Too much code to jump over.");
+    }
+
+    // DANGER: potential source of errors
+    current_bytecode()->code[offset] = jump & 0xffff;
 }
 
 static void
@@ -375,6 +398,28 @@ expression_statement() {
 }
 
 static void
+if_statement() {
+    consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition.");
+
+    int then_jump = emit_jump(OP_JUMP_IF_FALSE);
+    // emit_word(OP_POP);
+    statement();
+
+    int else_jump = emit_jump(OP_JUMP);
+
+    patch_jump(then_jump);
+    // emit_word(OP_POP);
+
+    if (match(TOKEN_ELSE)) {
+        statement();
+    }
+
+    patch_jump(else_jump);
+}
+
+static void
 print_statement() {
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after value.");
@@ -410,6 +455,8 @@ static void
 statement() {
     if (match(TOKEN_PRINT)) {
         print_statement();
+    } else if (match(TOKEN_IF)) {
+        if_statement();
     } else if (match(TOKEN_LEFT_BRACE)) {
         begin_scope();
         block();
