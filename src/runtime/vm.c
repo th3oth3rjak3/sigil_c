@@ -8,6 +8,7 @@
 #include "src/compiler/compiler.h"
 #include "src/debug/debug.h"
 #include "src/memory/memory.h"
+#include "src/runtime/bytecode.h"
 #include "src/types/hash_map.h"
 #include "src/types/object.h"
 #include "src/types/value.h"
@@ -25,7 +26,7 @@ reset_stack() {
 }
 
 static void
-runtimeError(const char* format, ...) {
+runtime_error(const char* format, ...) {
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);
@@ -79,11 +80,13 @@ void
 init_vm() {
     reset_stack();
     vm.objects = NULL;
+    init_hashmap(&vm.globals);
     init_hashmap(&vm.strings);
 }
 
 void
 free_vm() {
+    free_hashmap(&vm.globals);
     free_hashmap(&vm.strings);
     free_objects();
 }
@@ -92,15 +95,16 @@ static InterpretResult
 run() {
 #define READ_WORD() (*vm.ip++)
 #define READ_CONSTANT() (vm.bytecode->constants.values[READ_WORD()])
-#define BINARY_OP(valueType, op)                                               \
+#define READ_STRING() AS_STRING(READ_CONSTANT())
+#define BINARY_OP(value_type, op)                                              \
     do {                                                                       \
         if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {                      \
-            runtimeError("Operands must be numbers.");                         \
+            runtime_error("Operands must be numbers.");                        \
             return INTERPRET_RUNTIME_ERROR;                                    \
         }                                                                      \
         double b = AS_NUMBER(pop());                                           \
         double a = AS_NUMBER(pop());                                           \
-        push(valueType(a op b));                                               \
+        push(value_type(a op b));                                              \
     } while (false)
 
     for (;;) {
@@ -131,6 +135,34 @@ run() {
             case OP_FALSE:
                 push(BOOL_VAL(false));
                 break;
+            case OP_POP:
+                pop();
+                break;
+            case OP_GET_GLOBAL: {
+                ObjString* name = READ_STRING();
+                Value      value;
+                if (!hashmap_get(&vm.globals, name, &value)) {
+                    runtime_error("Undefined variable '%s'.", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push(value);
+                break;
+            }
+            case OP_DEFINE_GLOBAL: {
+                ObjString* name = READ_STRING();
+                hashmap_set(&vm.globals, name, peek(0));
+                pop();
+                break;
+            }
+            case OP_SET_GLOBAL: {
+                ObjString* name = READ_STRING();
+                if (hashmap_set(&vm.globals, name, peek(0))) {
+                    hashmap_delete(&vm.globals, name);
+                    runtime_error("Undefined variable '%s'.", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }
             case OP_EQUAL: {
                 Value b = pop();
                 Value a = pop();
@@ -151,7 +183,7 @@ run() {
                     double a = AS_NUMBER(pop());
                     push(NUMBER_VAL(a + b));
                 } else {
-                    runtimeError(
+                    runtime_error(
                         "Operands must be two numbers or two strings.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
@@ -171,15 +203,18 @@ run() {
                 break;
             case OP_NEGATE: {
                 if (!IS_NUMBER(peek(0))) {
-                    runtimeError("Operand must be a number.");
+                    runtime_error("Operand must be a number.");
                     return INTERPRET_RUNTIME_ERROR;
                 }
                 push(NUMBER_VAL(-AS_NUMBER(pop())));
                 break;
             }
-            case OP_RETURN: {
+            case OP_PRINT: {
                 print_value(pop());
                 printf("\n");
+                break;
+            }
+            case OP_RETURN: {
                 return INTERPRET_OK;
             }
         }
@@ -187,6 +222,7 @@ run() {
 
 #undef READ_WORD
 #undef READ_CONSTANT
+#undef READ_STRING
 #undef BINARY_OP
 }
 

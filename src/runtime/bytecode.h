@@ -10,20 +10,25 @@
 
 /// OpCode represents a runtime bytecode instruction.
 typedef enum {
-    OP_CONSTANT, // Load constant.
-    OP_NIL,      // No value
-    OP_TRUE,     // Literal true
-    OP_FALSE,    // Literal false
-    OP_EQUAL,    // Equality comparison
-    OP_GREATER,  // Greater comparison
-    OP_LESS,     // Less comparison
-    OP_ADD,      // Add two operands.
-    OP_SUBTRACT, // Subtract two operands.
-    OP_MULTIPLY, // Multiply two operands.
-    OP_DIVIDE,   // Divide two operands.
-    OP_NOT,      // Logical Negation (!true -> false)
-    OP_NEGATE,   // Negate an operand (2 -> -2)
-    OP_RETURN,   // Return from function call.
+    OP_CONSTANT,      // Load constant.
+    OP_NIL,           // No value
+    OP_TRUE,          // Literal true
+    OP_FALSE,         // Literal false
+    OP_POP,           // Pop a value off of the stack
+    OP_DEFINE_GLOBAL, // Define a global variable.
+    OP_GET_GLOBAL,    // Fetch a global variable.
+    OP_SET_GLOBAL,    // Set a global variable.
+    OP_EQUAL,         // Equality comparison
+    OP_GREATER,       // Greater comparison
+    OP_LESS,          // Less comparison
+    OP_ADD,           // Add two operands.
+    OP_SUBTRACT,      // Subtract two operands.
+    OP_MULTIPLY,      // Multiply two operands.
+    OP_DIVIDE,        // Divide two operands.
+    OP_NOT,           // Logical Negation (!true -> false)
+    OP_NEGATE,        // Negate an operand (2 -> -2)
+    OP_PRINT,         // Print to the console.
+    OP_RETURN,        // Return from function call.
 } OpCode;
 
 /// Bytecode represents compiled bytecode instructions.

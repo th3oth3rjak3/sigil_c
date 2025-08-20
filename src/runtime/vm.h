@@ -25,6 +25,7 @@ typedef struct {
     Value*    stack_top;        // The pointer to the top of the stack.
     Obj*      objects;          // The list of allocated objects on the heap.
     HashMap   strings;          // The collection of interned strings.
+    HashMap   globals;          // The collection of global variables.
 } VM;
 
 extern VM vm;
