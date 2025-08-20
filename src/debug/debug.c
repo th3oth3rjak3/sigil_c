@@ -15,6 +15,13 @@ simple_instruction(const char* name, int offset) {
 }
 
 static int
+word_instruction(const char* name, Bytecode* bytecode, int offset) {
+    uint16_t slot = bytecode->code[offset + 1];
+    printf("%-16s %4d\n", name, slot);
+    return offset + 2;
+}
+
+static int
 constant_instruction(const char* name, Bytecode* bytecode, int offset) {
     uint8_t constant = bytecode->code[offset + 1];
     printf("%-16s %4d '", name, constant);
@@ -52,6 +59,10 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return simple_instruction("OP_FALSE", offset);
         case OP_POP:
             return simple_instruction("OP_POP", offset);
+        case OP_GET_LOCAL:
+            return word_instruction("OP_GET_LOCAL", bytecode, offset);
+        case OP_SET_LOCAL:
+            return word_instruction("OP_SET_LOCAL", bytecode, offset);
         case OP_GET_GLOBAL:
             return constant_instruction("OP_GET_GLOBAL", bytecode, offset);
         case OP_DEFINE_GLOBAL:

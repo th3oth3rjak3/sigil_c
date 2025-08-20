@@ -138,6 +138,16 @@ run() {
             case OP_POP:
                 pop();
                 break;
+            case OP_GET_LOCAL: {
+                uint16_t slot = READ_WORD();
+                push(vm.stack[slot]);
+                break;
+            }
+            case OP_SET_LOCAL: {
+                uint16_t slot = READ_WORD();
+                vm.stack[slot] = peek(0);
+                break;
+            }
             case OP_GET_GLOBAL: {
                 ObjString* name = READ_STRING();
                 Value      value;

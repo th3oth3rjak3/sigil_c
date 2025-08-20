@@ -15,6 +15,8 @@ typedef enum {
     OP_TRUE,          // Literal true
     OP_FALSE,         // Literal false
     OP_POP,           // Pop a value off of the stack
+    OP_GET_LOCAL,     // Get a local variable.
+    OP_SET_LOCAL,     // Set a local variable.
     OP_DEFINE_GLOBAL, // Define a global variable.
     OP_GET_GLOBAL,    // Fetch a global variable.
     OP_SET_GLOBAL,    // Set a global variable.
