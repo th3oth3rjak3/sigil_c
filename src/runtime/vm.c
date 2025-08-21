@@ -132,8 +132,8 @@ is_falsey(Value value) {
 
 static void
 concatenate() {
-    ObjString* b = AS_STRING(pop());
-    ObjString* a = AS_STRING(pop());
+    const ObjString* b = AS_STRING(pop());
+    ObjString*       a = AS_STRING(pop());
 
     int   length = a->length + b->length;
     char* chars = ALLOCATE(char, length + 1);

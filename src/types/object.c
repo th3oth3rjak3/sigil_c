@@ -2,11 +2,11 @@
 #include <string.h>
 
 #include "bytecode.h"
-#include "memory.h"
-#include "vm.h"
 #include "hash_map.h"
+#include "memory.h"
 #include "object.h"
 #include "value.h"
+#include "vm.h"
 
 #define ALLOCATE_OBJ(type, objectType)                                         \
     (type*)allocate_object(sizeof(type), objectType)
@@ -71,7 +71,7 @@ copy_string(const char* chars, int length) {
 }
 
 static void
-print_function(ObjFunction* function) {
+print_function(const ObjFunction* function) {
     if (function->name == NULL) {
         printf("<script>");
         return;

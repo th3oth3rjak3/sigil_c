@@ -24,7 +24,7 @@ free_hashmap(HashMap* hash_map) {
 }
 
 static Entry*
-find_entry(Entry* entries, int capacity, ObjString* key) {
+find_entry(Entry* entries, int capacity, const ObjString* key) {
     uint32_t index = key->hash % capacity;
     Entry*   tombstone = NULL;
 
@@ -77,15 +77,15 @@ adjust_capacity(HashMap* hash_map, int capacity) {
     hash_map->capacity = capacity;
 }
 
-void
-hashmap_copy_all(HashMap* source, HashMap* dest) {
-    for (int i = 0; i < source->capacity; i++) {
-        Entry* entry = &source->entries[i];
-        if (entry->key != NULL) {
-            hashmap_set(dest, entry->key, entry->value);
-        }
-    }
-}
+// void
+// hashmap_copy_all(HashMap* source, HashMap* dest) {
+//     for (int i = 0; i < source->capacity; i++) {
+//         Entry* entry = &source->entries[i];
+//         if (entry->key != NULL) {
+//             hashmap_set(dest, entry->key, entry->value);
+//         }
+//     }
+// }
 
 bool
 hashmap_set(HashMap* hash_map, ObjString* key, Value value) {
@@ -105,11 +105,11 @@ hashmap_set(HashMap* hash_map, ObjString* key, Value value) {
 }
 
 bool
-hashmap_get(HashMap* hash_map, ObjString* key, Value* value) {
+hashmap_get(HashMap* hash_map, const ObjString* key, Value* value) {
     if (hash_map->count == 0)
         return false;
 
-    Entry* entry = find_entry(hash_map->entries, hash_map->capacity, key);
+    const Entry* entry = find_entry(hash_map->entries, hash_map->capacity, key);
     if (entry->key == NULL)
         return false;
 
@@ -118,7 +118,7 @@ hashmap_get(HashMap* hash_map, ObjString* key, Value* value) {
 }
 
 bool
-hashmap_delete(HashMap* hash_map, ObjString* key) {
+hashmap_delete(HashMap* hash_map, const ObjString* key) {
     if (hash_map->count == 0)
         return false;
 

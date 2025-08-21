@@ -3,10 +3,10 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "common.h"
 #include "bytecode.h"
-#include "scanner.h"
+#include "common.h"
 #include "object.h"
+#include "scanner.h"
 #include "value.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -15,7 +15,7 @@
 #include <string.h>
 
 #ifdef DEBUG_PRINT_CODE
-#include "src/debug/debug.h"
+#include "debug.h"
 #endif
 
 /// Parser handles precedence parsing of tokens into bytecode.
@@ -82,7 +82,7 @@ Compiler* current = NULL;
 Bytecode* compiling_bytecode;
 
 static void
-error_at(Token* token, const char* message) {
+error_at(const Token* token, const char* message) {
     if (parser.panic_mode)
         return;
 
@@ -313,19 +313,19 @@ parse_precedence(Precedence precedence) {
 }
 
 static uint16_t
-identifier_constant(Token* name) {
+identifier_constant(const Token* name) {
     return make_constant(OBJ_VAL(copy_string(name->start, name->length)));
 }
 
 static bool
-identifiers_equal(Token* a, Token* b) {
+identifiers_equal(const Token* a, const Token* b) {
     if (a->length != b->length)
         return false;
     return memcmp(a->start, b->start, a->length) == 0;
 }
 
 static int
-resolve_local(Compiler* compiler, Token* name) {
+resolve_local(Compiler* compiler, const Token* name) {
     for (int i = compiler->local_count - 1; i >= 0; i--) {
         Local* local = &compiler->locals[i];
         if (identifiers_equal(name, &local->name)) {
@@ -356,7 +356,7 @@ declare_variable() {
     if (current->scope_depth == 0)
         return;
 
-    Token* name = &parser.previous;
+    const Token* name = &parser.previous;
 
     // ensure users can't create duplicate variable declarations in the same
     // scope.
@@ -746,8 +746,8 @@ unary(bool can_assign) {
 
 static void
 binary(bool can_assign) {
-    TokenType  operator_type = parser.previous.type;
-    ParseRule* rule = get_rule(operator_type);
+    TokenType        operator_type = parser.previous.type;
+    const ParseRule* rule = get_rule(operator_type);
     parse_precedence((Precedence)(rule->precedence + 1));
 
     switch (operator_type) {
@@ -872,6 +872,6 @@ compile(const char* source) {
         declaration();
     }
 
-    ObjFunction* function = end_compiler();
-    return parser.had_error ? NULL : function;
+    ObjFunction* func = end_compiler();
+    return parser.had_error ? NULL : func;
 }

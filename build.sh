@@ -206,11 +206,15 @@ run_cppcheck() {
     if command -v cppcheck &> /dev/null; then
         cppcheck --project=$BUILD_DIR/compile_commands.json \
                  --enable=all \
+                 --check-level=exhaustive \
                  --std=c11 \
+                 --quiet \
                  --inline-suppr \
                  --suppress=missingIncludeSystem \
                  -i $BUILD_DIR \
-                 --suppress="*:*_tests.c"
+                 --suppress="*:*_tests.c" \
+                 --suppress=checkersReport \
+                 --library=posix.cfg
         if [ $? -eq 0 ]; then
             print_success "Cppcheck completed successfully"
         else
