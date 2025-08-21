@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Sigil",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/sigil.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb",
+            "miDebuggerPath": "lldb"
+        }
+    ]
+}

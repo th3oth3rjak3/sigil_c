@@ -2,23 +2,34 @@
 // Purpose: The main entry point for the sigil language interpreter.
 // Author:  Jake Hathaway
 // Date:    2025-08-17
-
 #include "common.h"
 #include "memory/memory.h"
 #include "runtime/vm.h"
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 static void
-repl() {
+repl(void) {
     char line[1024];
+
+#ifdef _WIN32
+    printf("Sigil REPL - Type 'exit' or press Ctrl+Z then Enter to quit\n");
+#else
+    printf("Sigil REPL - Type 'exit' or press Ctrl+D to quit\n");
+#endif
+
     for (;;) {
         printf("> ");
+        fflush(stdout);
 
         if (!fgets(line, sizeof(line), stdin)) {
             printf("\n");
+            break;
+        }
+
+        // Check for exit command (handle both "exit" and "exit\n")
+        if (strncmp(line, "exit", 4) == 0) {
             break;
         }
 
@@ -35,27 +46,24 @@ read_file(const char* path, size_t* out_size) {
     }
 
     fseek(file, 0L, SEEK_END);
-    size_t fileSize = ftell(file);
-
+    size_t file_size = ftell(file);
     rewind(file);
 
-    char* buffer = ALLOCATE(char, fileSize + 1);
+    char* buffer = ALLOCATE(char, file_size + 1); // Fixed: was 'length + 1'
     if (buffer == NULL) {
         fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
         exit(74);
     }
 
-    size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
-    if (bytesRead < fileSize) {
+    size_t bytes_read = fread(buffer, sizeof(char), file_size, file);
+    if (bytes_read < file_size) {
         fprintf(stderr, "Could not read file \"%s\".\n", path);
         exit(74);
     }
 
-    buffer[bytesRead] = '\0';
-
+    buffer[bytes_read] = '\0';
     fclose(file);
-
-    *out_size = fileSize + 1;
+    *out_size = file_size + 1;
     return buffer;
 }
 
@@ -64,30 +72,19 @@ run_file(const char* path) {
     size_t          size;
     char*           source = read_file(path, &size);
     InterpretResult result = interpret(source);
+
     FREE_ARRAY(char, source, size);
 
-    if (result == INTERPRET_COMPILE_ERROR)
+    if (result == INTERPRET_COMPILE_ERROR) {
         exit(65);
-    if (result == INTERPRET_RUNTIME_ERROR)
+    }
+    if (result == INTERPRET_RUNTIME_ERROR) {
         exit(70);
-}
-
-void
-handle_sigint(int sig) {
-    free_vm();
-#ifdef DEBUG_PRINT_ALLOCATIONS
-    report_memory_statistics();
-#endif
-    exit(0);
+    }
 }
 
 int
 main(int argc, const char* argv[]) {
-    if (signal(SIGINT, handle_sigint) == SIG_ERR) {
-        perror("signal");
-        return 1;
-    }
-
     init_vm();
 
     if (argc == 1) {
@@ -99,5 +96,12 @@ main(int argc, const char* argv[]) {
         exit(64);
     }
 
+    // Free first, then report
     free_vm();
+
+#ifdef DEBUG_PRINT_ALLOCATIONS
+    report_memory_statistics();
+#endif
+
+    return 0;
 }

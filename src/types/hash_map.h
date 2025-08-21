@@ -58,7 +58,7 @@ hashmap_set(HashMap* hash_map, ObjString* key, Value value);
 /// Returns:
 /// - bool: True if the value was found, otherwise false.
 bool
-hashmap_get(HashMap* hash_map, ObjString* key, Value* value);
+hashmap_get(HashMap* hash_map, const ObjString* key, Value* value);
 
 /// Delete an entry from the hash map with the corresponding key.
 ///
@@ -70,7 +70,7 @@ hashmap_get(HashMap* hash_map, ObjString* key, Value* value);
 /// - bool: True when the entry was found and the delete succeeds, otherwise
 /// false.
 bool
-hashmap_delete(HashMap* hash_map, ObjString* key);
+hashmap_delete(HashMap* hash_map, const ObjString* key);
 
 /// Copy all the contents from one hash map to another.
 ///

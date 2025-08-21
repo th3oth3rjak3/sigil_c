@@ -7,7 +7,7 @@
 
 #include "hash_map.h"
 
-#define FRAMES_MAX 10000
+#define FRAMES_MAX 1000
 #define STACK_MAX (FRAMES_MAX * 1024)
 
 /// A function call frame for managing function state.
