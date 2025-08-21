@@ -3,9 +3,9 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "src/common.h"
-#include "src/memory/memory.h"
-#include "src/runtime/vm.h"
+#include "common.h"
+#include "memory/memory.h"
+#include "runtime/vm.h"
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>

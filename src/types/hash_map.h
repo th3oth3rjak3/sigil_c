@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "src/types/object.h"
-#include "src/types/value.h"
+#include "object.h"
+#include "value.h"
 
 /// An entry in the hash map.
 typedef struct {

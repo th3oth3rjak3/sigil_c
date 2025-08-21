@@ -3,13 +3,13 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "src/runtime/vm.h"
-#include "src/compiler/compiler.h"
-#include "src/memory/memory.h"
-#include "src/runtime/bytecode.h"
-#include "src/types/hash_map.h"
-#include "src/types/object.h"
-#include "src/types/value.h"
+#include "vm.h"
+#include "compiler.h"
+#include "memory.h"
+#include "bytecode.h"
+#include "hash_map.h"
+#include "object.h"
+#include "value.h"
 
 #include <stdarg.h>
 #include <stdbool.h>

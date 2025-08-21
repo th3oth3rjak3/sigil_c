@@ -3,12 +3,12 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "src/memory/memory.h"
+#include "memory.h"
 #include "bytecode.h"
-#include "src/common.h"
-#include "src/runtime/vm.h"
-#include "src/types/object.h"
-#include "src/types/value.h"
+#include "common.h"
+#include "vm.h"
+#include "object.h"
+#include "value.h"
 #include <stdio.h>
 #include <stdlib.h>
 

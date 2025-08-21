@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "src/runtime/bytecode.h"
-#include "src/types/value.h"
+#include "bytecode.h"
+#include "value.h"
 #include <stdint.h>
 
 // Get the type of the object.

@@ -2,11 +2,11 @@
 #include <string.h>
 
 #include "bytecode.h"
-#include "src/memory/memory.h"
-#include "src/runtime/vm.h"
-#include "src/types/hash_map.h"
-#include "src/types/object.h"
-#include "src/types/value.h"
+#include "memory.h"
+#include "vm.h"
+#include "hash_map.h"
+#include "object.h"
+#include "value.h"
 
 #define ALLOCATE_OBJ(type, objectType)                                         \
     (type*)allocate_object(sizeof(type), objectType)

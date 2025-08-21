@@ -3,8 +3,8 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "src/debug/debug.h"
-#include "src/runtime/bytecode.h"
+#include "debug.h"
+#include "bytecode.h"
 
 #include <stdio.h>
 

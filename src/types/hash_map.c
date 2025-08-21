@@ -3,9 +3,9 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-19
 
-#include "src/types/hash_map.h"
-#include "src/memory/memory.h"
-#include "src/types/value.h"
+#include "hash_map.h"
+#include "memory.h"
+#include "value.h"
 #include <string.h>
 
 #define TABLE_MAX_LOAD 0.75

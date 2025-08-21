@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "src/runtime/bytecode.h"
+#include "bytecode.h"
 
 /// Disassemble and print the contents of the bytecode.
 ///

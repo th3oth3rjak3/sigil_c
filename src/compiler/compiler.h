@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "src/types/object.h"
+#include "object.h"
 #include <stdbool.h>
 
 /// Compile the source code into a bytecode structure.

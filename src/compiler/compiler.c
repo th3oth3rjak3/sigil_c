@@ -3,11 +3,11 @@
 // Author:  Jake Hathaway
 // Date:    2025-08-17
 
-#include "src/common.h"
-#include "src/runtime/bytecode.h"
-#include "src/scanner/scanner.h"
-#include "src/types/object.h"
-#include "src/types/value.h"
+#include "common.h"
+#include "bytecode.h"
+#include "scanner.h"
+#include "object.h"
+#include "value.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>

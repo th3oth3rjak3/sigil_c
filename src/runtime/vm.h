@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "src/types/hash_map.h"
+#include "hash_map.h"
 
 #define FRAMES_MAX 10000
 #define STACK_MAX (FRAMES_MAX * 1024)
