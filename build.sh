@@ -1,6 +1,7 @@
 #!/bin/bash
 
 BUILD_DIR=build
+BUILD_RELEASE_DIR=build-release
 EXECUTABLE=sigil   # change as needed
 
 function configure_build() {
@@ -11,6 +12,11 @@ function configure_build() {
 function build_project() {
   echo "Building project..."
   meson compile -C "$BUILD_DIR" --verbose
+}
+
+function build_release() {
+    echo "Building project in release mode..."
+    meson compile -C "$BUILD_RELEASE_DIR" --verbose
 }
 
 function clean_build() {
@@ -38,7 +44,11 @@ case "$1" in
     build_project
     ;;
   run)
+    build_project
     run_executable
+    ;;
+  release)
+    build_release
     ;;
   "")
     configure_build

@@ -5,6 +5,7 @@
 
 #include "src/memory/memory.h"
 #include "bytecode.h"
+#include "src/common.h"
 #include "src/runtime/vm.h"
 #include "src/types/object.h"
 #include "src/types/value.h"

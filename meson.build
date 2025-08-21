@@ -9,6 +9,7 @@ includes = include_directories(
     'src/runtime',
     'src/scanner',
     'src/types',
+    'src',
   ],
 )
 
