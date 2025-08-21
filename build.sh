@@ -201,6 +201,27 @@ clean_build() {
     print_success "Build directory cleaned"
 }
 
+run_cppcheck() {
+    print_header "Running Cppcheck (excluding tests)"
+    if command -v cppcheck &> /dev/null; then
+        cppcheck --project=$BUILD_DIR/compile_commands.json \
+                 --enable=all \
+                 --std=c11 \
+                 --inline-suppr \
+                 --suppress=missingIncludeSystem \
+                 -i $BUILD_DIR \
+                 --suppress="*:*_tests.c"
+        if [ $? -eq 0 ]; then
+            print_success "Cppcheck completed successfully"
+        else
+            print_warning "Cppcheck found issues"
+        fi
+    else
+        print_error "Cppcheck not installed"
+        exit 1
+    fi
+}
+
 # New function to check if Ninja is available
 check_ninja() {
     if ! command -v ninja &> /dev/null; then
@@ -240,6 +261,9 @@ case "$1" in
         ;;
     "clean")
         clean_build
+        ;;
+    "cppcheck")
+        run_cppcheck
         ;;
     "help"|"-h"|"--help")
         echo "Usage: ./build.sh [command]"
