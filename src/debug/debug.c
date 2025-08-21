@@ -102,6 +102,8 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return jump_instruction("OP_JUMP_IF_FALSE", 1, bytecode, offset);
         case OP_LOOP:
             return jump_instruction("OP_LOOP", -1, bytecode, offset);
+        case OP_CALL:
+            return word_instruction("OP_CALL", bytecode, offset);
         case OP_RETURN:
             return simple_instruction("OP_RETURN", offset);
         default:

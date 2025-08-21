@@ -38,7 +38,7 @@ read_file(const char* path, size_t* out_size) {
 
     rewind(file);
 
-    char* buffer = (char*)GlobalAllocator.alloc(fileSize + 1);
+    char* buffer = ALLOCATE(char, fileSize + 1);
     if (buffer == NULL) {
         fprintf(stderr, "Not enough memory to read \"%s\".\n", path);
         exit(74);
@@ -63,7 +63,7 @@ run_file(const char* path) {
     size_t          size;
     char*           source = read_file(path, &size);
     InterpretResult result = interpret(source);
-    GlobalAllocator.free(source, size);
+    FREE_ARRAY(char, source, size);
 
     if (result == INTERPRET_COMPILE_ERROR)
         exit(65);
@@ -74,7 +74,9 @@ run_file(const char* path) {
 void
 handle_sigint(int sig) {
     free_vm();
-    GlobalAllocator.report_statistics();
+#ifdef DEBUG_PRINT_ALLOCATIONS
+    report_memory_statistics();
+#endif
     exit(0);
 }
 

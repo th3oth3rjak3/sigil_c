@@ -5,16 +5,15 @@
 
 #pragma once
 
-#include "src/runtime/bytecode.h"
+#include "src/types/object.h"
 #include <stdbool.h>
 
 /// Compile the source code into a bytecode structure.
 ///
 /// Params:
 /// - source: The source code.
-/// - bytecode: An output param that contains the bytecode.
 ///
 /// Returns:
-/// - bool: True when compilation succeeds, otherwise false.
-bool
-compile(const char* source, Bytecode* bytecode);
+/// - ObjFunction*: The compiled function.
+ObjFunction*
+compile(const char* source);

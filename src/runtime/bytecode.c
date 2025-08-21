@@ -20,8 +20,8 @@ init_bytecode(Bytecode* bytecode) {
 
 void
 free_bytecode(Bytecode* bytecode) {
-    FREE_ARRAY(GlobalAllocator, uint16_t, bytecode->code, bytecode->capacity);
-    FREE_ARRAY(GlobalAllocator, int, bytecode->lines, bytecode->capacity);
+    FREE_ARRAY(uint16_t, bytecode->code, bytecode->capacity);
+    FREE_ARRAY(int, bytecode->lines, bytecode->capacity);
     free_value_array(&bytecode->constants);
     init_bytecode(bytecode);
 }
@@ -32,17 +32,9 @@ write_bytecode(Bytecode* bytecode, uint16_t word, int line) {
         int old_capacity = bytecode->capacity;
         bytecode->capacity = GROW_CAPACITY(old_capacity);
         bytecode->code = GROW_ARRAY(
-            GlobalAllocator,
-            uint16_t,
-            bytecode->code,
-            old_capacity,
-            bytecode->capacity);
-        bytecode->lines = GROW_ARRAY(
-            GlobalAllocator,
-            int,
-            bytecode->lines,
-            old_capacity,
-            bytecode->capacity);
+            uint16_t, bytecode->code, old_capacity, bytecode->capacity);
+        bytecode->lines =
+            GROW_ARRAY(int, bytecode->lines, old_capacity, bytecode->capacity);
     }
 
     bytecode->code[bytecode->count] = word;

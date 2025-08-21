@@ -5,7 +5,6 @@
 
 #include "src/types/hash_map.h"
 #include "src/memory/memory.h"
-#include "src/types/object.h"
 #include "src/types/value.h"
 #include <string.h>
 
@@ -20,7 +19,7 @@ init_hashmap(HashMap* hash_map) {
 
 void
 free_hashmap(HashMap* hash_map) {
-    FREE_ARRAY(GlobalAllocator, Entry, hash_map->entries, hash_map->capacity);
+    FREE_ARRAY(Entry, hash_map->entries, hash_map->capacity);
     init_hashmap(hash_map);
 }
 
@@ -52,7 +51,7 @@ find_entry(Entry* entries, int capacity, ObjString* key) {
 static void
 adjust_capacity(HashMap* hash_map, int capacity) {
     // Create a new entries array to copy into of the right size.
-    Entry* new_entries = ALLOC_WITH(GlobalAllocator, Entry, capacity);
+    Entry* new_entries = ALLOCATE(Entry, capacity);
     // Pre-set all of the contents to valid values.
     for (int i = 0; i < capacity; i++) {
         new_entries[i].key = NULL;
@@ -73,7 +72,7 @@ adjust_capacity(HashMap* hash_map, int capacity) {
         hash_map->count++;
     }
 
-    FREE_ARRAY(GlobalAllocator, Entry, hash_map->entries, hash_map->capacity);
+    FREE_ARRAY(Entry, hash_map->entries, hash_map->capacity);
     hash_map->entries = new_entries;
     hash_map->capacity = capacity;
 }
