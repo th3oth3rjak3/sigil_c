@@ -7,10 +7,7 @@ project(sigil VERSION 0.0.1 LANGUAGES C)
 
 # Try to replicate Meson's simpler approach
 if(WIN32)
-    # Use different runtime library approach
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-    # OR try this instead:
-    # set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 endif()
 
 # C standard
@@ -69,4 +66,4 @@ else()
     message(STATUS "Unix: Set stack to 8MB")
 endif()
 
-message(STATUS "Building with AddressSanitizer (Meson-style)")
+message(STATUS "Building with AddressSanitizer")
