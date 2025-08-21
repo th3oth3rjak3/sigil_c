@@ -4,10 +4,10 @@
 // Date:    2025-08-17
 
 #include "vm.h"
-#include "compiler.h"
-#include "memory.h"
 #include "bytecode.h"
+#include "compiler.h"
 #include "hash_map.h"
+#include "memory.h"
 #include "object.h"
 #include "value.h"
 
@@ -110,12 +110,13 @@ call_value(Value callee, int arg_count) {
         switch (OBJ_TYPE(callee)) {
             case OBJ_FUNCTION:
                 return call(AS_FUNCTION(callee), arg_count);
-            case OBJ_NATIVE:
+            case OBJ_NATIVE: {
                 NativeFn native = AS_NATIVE(callee);
                 Value    result = native(arg_count, vm.stack_top - arg_count);
                 vm.stack_top -= arg_count + 1;
                 push(result);
                 return true;
+            }
             default:
                 break; // Non-callable object type.
         }

@@ -1,9 +1,10 @@
 {
-    "mesonbuild.configureOnOpen": true,
-    "files.associations": {
-        "*.lalrpop": "lalrpop",
-        "string.h": "c",
-        "memory.h": "c"
-    },
-    "C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
+    "cmake.sourceDirectory": "${workspaceFolder}/src",
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.errorSquiggles": "enabled",
+    "cmake.configureSettings": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+    }
 }
