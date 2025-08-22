@@ -21,13 +21,20 @@
 // Determine if the object is a native function.
 #define IS_NATIVE(value) is_obj_type(value, OBJ_NATIVE)
 
+// Determine if the object is a function closure.
+#define IS_CLOSURE(value) is_obj_type(value, OBJ_CLOSURE)
+
 // Convert the object to an ObjString type.
 #define AS_STRING(value) ((ObjString*)AS_OBJ(value))
 
 // Convert the object to an ObjFunction type.
 #define AS_FUNCTION(value) ((ObjFunction*)AS_OBJ(value))
 
+// Convert the object to an ObjNative type.
 #define AS_NATIVE(value) (((ObjNative*)AS_OBJ(value))->function)
+
+// Convert the object to an ObjClosure type.
+#define AS_CLOSURE(value) ((ObjClosure*)AS_OBJ(value))
 
 // Convert the object to a raw C string.
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
@@ -36,6 +43,8 @@
 /// in the language.
 typedef enum {
     OBJ_FUNCTION, // A function
+    OBJ_UPVALUE,  // A closure upvalue.
+    OBJ_CLOSURE,  // A function closure.
     OBJ_NATIVE,   // A native C function.
     OBJ_STRING,   // A string.
 } ObjType;
@@ -48,10 +57,11 @@ struct Obj {
 
 /// A function that can be called.
 typedef struct {
-    Obj        obj;      // The object header.
-    int        arity;    // The number of function parameters.
-    Bytecode   bytecode; // The bytecode for the function body.
-    ObjString* name;     // The function name.
+    Obj        obj;           // The object header.
+    int        arity;         // The number of function parameters.
+    int        upvalue_count; // The number of upvalues.
+    Bytecode   bytecode;      // The bytecode for the function body.
+    ObjString* name;          // The function name.
 } ObjFunction;
 
 /// A native C function.
@@ -78,6 +88,22 @@ struct ObjString {
     uint32_t hash;   // The precomputed hash for the string.
 };
 
+/// A runtime upvalue.
+typedef struct ObjUpvalue {
+    Obj    obj;              // The object header.
+    Value* location;         // The location of the upvalue.
+    Value  closed;           // The location of the closed upvalue when non-nil.
+    struct ObjUpvalue* next; // The next upvalue.
+} ObjUpvalue;
+
+/// A function closure.
+typedef struct {
+    Obj          obj;           // The object header.
+    ObjFunction* function;      // The function.
+    ObjUpvalue** upvalues;      // Upvalues.
+    int          upvalue_count; // The number of upvalues.
+} ObjClosure;
+
 /// Create a new function.
 ///
 /// Returns:
@@ -95,6 +121,16 @@ new_function();
 ObjNative*
 new_native(NativeFn function);
 
+/// Create a new function closure.
+///
+/// Params:
+/// - function: The function pointer for this closure.
+///
+/// Returns:
+/// - ObjClosure*: The pointer to the closure.
+ObjClosure*
+new_closure(ObjFunction* function);
+
 /// Create a deep copy of the string.
 ///
 /// Params:
@@ -105,6 +141,16 @@ new_native(NativeFn function);
 /// - ObjString*: A pointer to the newly allocated string object.
 ObjString*
 copy_string(const char* chars, int length);
+
+/// Create a new upvalue.
+///
+/// Params:
+/// - slot: The slot where the upvalue lives.
+///
+/// Returns:
+/// - ObjUpvalue*: A pointer to the upvalue object.
+ObjUpvalue*
+new_upvalue(Value* slot);
 
 /// Print the object to stdout.
 ///

@@ -1,0 +1,12 @@
+fun addN(n) {
+    fun add(a) {
+        return a + n;
+    }
+
+    return add;
+}
+
+var add10 = addN(10);
+var result = add10(20);
+
+print result;

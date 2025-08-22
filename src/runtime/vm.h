@@ -12,9 +12,9 @@
 
 /// A function call frame for managing function state.
 typedef struct {
-    ObjFunction* function; // The function.
-    uint16_t*    ip;       // The instruction pointer to return to.
-    Value*       slots;    // A pointer to local value slots.
+    ObjClosure* closure; // The function closure for the call frame.
+    uint16_t*   ip;      // The instruction pointer to return to.
+    Value*      slots;   // A pointer to local value slots.
 } CallFrame;
 
 /// The result of interpreting the bytecode.
@@ -26,13 +26,14 @@ typedef enum {
 
 /// The virtual machine executes the bytecode program.
 typedef struct {
-    CallFrame frames[FRAMES_MAX]; // A list of call frames.
-    int       frame_count;        // The number of call frames used.
-    Value     stack[STACK_MAX];   // The virtual machine stack.
-    Value*    stack_top;          // The pointer to the top of the stack.
-    Obj*      objects;            // The list of allocated objects on the heap.
-    HashMap   strings;            // The collection of interned strings.
-    HashMap   globals;            // The collection of global variables.
+    CallFrame   frames[FRAMES_MAX]; // A list of call frames.
+    int         frame_count;        // The number of call frames used.
+    Value       stack[STACK_MAX];   // The virtual machine stack.
+    Value*      stack_top;          // The pointer to the top of the stack.
+    Obj*        objects;       // The list of allocated objects on the heap.
+    HashMap     strings;       // The collection of interned strings.
+    ObjUpvalue* open_upvalues; // Upvalues that are still live in the stack.
+    HashMap     globals;       // The collection of global variables.
 } VM;
 
 extern VM vm;

@@ -20,6 +20,8 @@ typedef enum {
     OP_DEFINE_GLOBAL, // Define a global variable.
     OP_GET_GLOBAL,    // Fetch a global variable.
     OP_SET_GLOBAL,    // Set a global variable.
+    OP_GET_UPVALUE,   // Get an upvalue
+    OP_SET_UPVALUE,   // Set an upvalue
     OP_EQUAL,         // Equality comparison
     OP_GREATER,       // Greater comparison
     OP_LESS,          // Less comparison
@@ -34,6 +36,8 @@ typedef enum {
     OP_JUMP_IF_FALSE, // Jump if the condition is false.
     OP_LOOP,          // Loop instruction
     OP_CALL,          // Call a function
+    OP_CLOSURE,       // Handle a closure.
+    OP_CLOSE_UPVALUE, // Close an upvalue (move to heap).
     OP_RETURN,        // Return from function call.
 } OpCode;
 

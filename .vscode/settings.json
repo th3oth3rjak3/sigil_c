@@ -6,5 +6,9 @@
     "C_Cpp.errorSquiggles": "enabled",
     "cmake.configureSettings": {
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+    },
+    "files.associations": {
+        "*.sgl": "rust",
+        "functional": "c"
     }
 }

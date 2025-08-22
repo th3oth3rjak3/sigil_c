@@ -6,9 +6,9 @@
 #include "memory.h"
 #include "bytecode.h"
 #include "common.h"
-#include "vm.h"
 #include "object.h"
 #include "value.h"
+#include "vm.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -108,6 +108,16 @@ free_object(Obj* object) {
             ObjFunction* function = (ObjFunction*)object;
             free_bytecode(&function->bytecode);
             FREE(ObjFunction, object);
+            break;
+        }
+        case OBJ_CLOSURE: {
+            ObjClosure* closure = (ObjClosure*)object;
+            FREE_ARRAY(ObjUpvalue*, closure->upvalues, closure->upvalue_count);
+            FREE(ObjClosure, object);
+            break;
+        }
+        case OBJ_UPVALUE: {
+            FREE(ObjUpvalue, object);
             break;
         }
         case OBJ_NATIVE: {

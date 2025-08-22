@@ -2,5 +2,5 @@ fun add(a, b) {
     return a + b;
 }
 
-let result = add(2, 3);
-print(result);
+var result = add(2, 3);
+print result;

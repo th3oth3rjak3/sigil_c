@@ -6,6 +6,7 @@
 #include "debug.h"
 #include "bytecode.h"
 
+#include <object.h>
 #include <stdio.h>
 
 static int
@@ -104,6 +105,33 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return jump_instruction("OP_LOOP", -1, bytecode, offset);
         case OP_CALL:
             return word_instruction("OP_CALL", bytecode, offset);
+        case OP_CLOSURE: {
+            offset++;
+            uint16_t constant = bytecode->code[offset++];
+            printf("%-16s %4d ", "OP_CLOSURE", constant);
+            print_value(bytecode->constants.values[constant]);
+            printf("\n");
+
+            ObjFunction* function =
+                AS_FUNCTION(bytecode->constants.values[constant]);
+            for (int j = 0; j < function->upvalue_count; j++) {
+                int is_local = bytecode->code[offset++];
+                int index = bytecode->code[offset++];
+                printf(
+                    "%04d      |                     %s %d\n",
+                    offset - 2,
+                    is_local ? "local" : "upvalue",
+                    index);
+            }
+
+            return offset;
+        }
+        case OP_GET_UPVALUE:
+            return word_instruction("OP_GET_UPVALUE", bytecode, offset);
+        case OP_SET_UPVALUE:
+            return word_instruction("OP_SET_UPVALUE", bytecode, offset);
+        case OP_CLOSE_UPVALUE:
+            return simple_instruction("OP_CLOSE_UPVALUE", offset);
         case OP_RETURN:
             return simple_instruction("OP_RETURN", offset);
         default:
