@@ -5,8 +5,10 @@
 
 #pragma once
 
-#include "object.h"
+#include "common.h"
 #include "value.h"
+
+typedef struct ObjString ObjString;
 
 /// An entry in the hash map.
 typedef struct {

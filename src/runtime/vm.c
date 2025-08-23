@@ -6,6 +6,7 @@
 #include "vm.h"
 #include "bytecode.h"
 #include "compiler.h"
+#include "debug.h"
 #include "hash_map.h"
 #include "memory.h"
 #include "object.h"
@@ -119,6 +120,11 @@ call_value(Value callee, int arg_count) {
                 Value    result = native(arg_count, vm.stack_top - arg_count);
                 vm.stack_top -= arg_count + 1;
                 push(result);
+                return true;
+            }
+            case OBJ_CLASS: {
+                ObjClass* klass = AS_CLASS(callee);
+                vm.stack_top[-arg_count - 1] = OBJ_VAL(new_instance(klass));
                 return true;
             }
             default:
@@ -404,6 +410,44 @@ run() {
             case OP_CLOSE_UPVALUE: {
                 close_upvalues(vm.stack_top - 1);
                 pop();
+                break;
+            }
+            case OP_CLASS: {
+                ObjString* name = READ_STRING();
+                push(OBJ_VAL(name));
+                ObjClass* klass = new_class(name);
+                pop();
+                push(OBJ_VAL(klass));
+                break;
+            }
+            case OP_GET_PROPERTY: {
+                if (!IS_INSTANCE(peek(0))) {
+                    runtime_error("Only instances have properties.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjInstance* instance = AS_INSTANCE(peek(0));
+                ObjString*   name = READ_STRING();
+
+                Value value;
+                if (hashmap_get(&instance->fields, name, &value)) {
+                    pop(); // the instance
+                    push(value);
+                    break;
+                }
+
+                runtime_error("Undefined property '%s'.", name->chars);
+                return INTERPRET_RUNTIME_ERROR;
+            }
+            case OP_SET_PROPERTY: {
+                if (!IS_INSTANCE(peek(1))) {
+                    runtime_error("Only instances have fields.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjInstance* instance = AS_INSTANCE(peek(1));
+                hashmap_set(&instance->fields, READ_STRING(), peek(0));
+                Value value = pop();
+                pop();
+                push(value);
                 break;
             }
             case OP_RETURN: {

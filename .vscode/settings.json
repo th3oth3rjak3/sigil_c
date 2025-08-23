@@ -9,6 +9,7 @@
     },
     "files.associations": {
         "*.sgl": "rust",
-        "functional": "c"
+        "functional": "c",
+        "hash_map.h": "c"
     }
 }

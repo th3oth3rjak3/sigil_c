@@ -6,6 +6,7 @@
 #pragma once
 
 #include "bytecode.h"
+#include "hash_map.h"
 #include "value.h"
 #include <stdint.h>
 
@@ -24,6 +25,12 @@
 // Determine if the object is a function closure.
 #define IS_CLOSURE(value) is_obj_type(value, OBJ_CLOSURE)
 
+// Determine if the object is a class instance.
+#define IS_INSTANCE(value) is_obj_type(value, OBJ_INSTANCE)
+
+// Determine if the object is a class.
+#define IS_CLASS(value) is_obj_type(value, OBJ_CLASS)
+
 // Convert the object to an ObjString type.
 #define AS_STRING(value) ((ObjString*)AS_OBJ(value))
 
@@ -39,6 +46,12 @@
 // Convert the object to a raw C string.
 #define AS_CSTRING(value) (((ObjString*)AS_OBJ(value))->chars)
 
+// Convert the object to a class.
+#define AS_CLASS(value) ((ObjClass*)AS_OBJ(value))
+
+// Convert the object to a class instance.
+#define AS_INSTANCE(value) ((ObjInstance*)AS_OBJ(value))
+
 /// A tag to identify the different types of objects supported
 /// in the language.
 typedef enum {
@@ -47,6 +60,8 @@ typedef enum {
     OBJ_CLOSURE,  // A function closure.
     OBJ_NATIVE,   // A native C function.
     OBJ_STRING,   // A string.
+    OBJ_CLASS,    // A class.
+    OBJ_INSTANCE, // A class instance.
 } ObjType;
 
 /// An object instance.
@@ -104,6 +119,19 @@ typedef struct {
     ObjUpvalue** upvalues;      // Upvalues.
     int          upvalue_count; // The number of upvalues.
 } ObjClosure;
+
+/// A class definition.
+typedef struct {
+    Obj        obj;  // The object header.
+    ObjString* name; // The class name.
+} ObjClass;
+
+/// An instance of a class.
+typedef struct {
+    Obj       obj;    // The object header.
+    ObjClass* klass;  // The class type.
+    HashMap   fields; // A collection of fields and values.
+} ObjInstance;
 
 /// Create a new function.
 ///
@@ -170,6 +198,26 @@ print_object(Value value);
 /// - ObjString*: The owned string pointer.
 ObjString*
 take_string(char* chars, int length);
+
+/// Create a new class definition.
+///
+/// Params:
+/// - name: The name of the class.
+///
+/// Returns:
+/// - ObjClass*: a pointer to the class object.
+ObjClass*
+new_class(ObjString* name);
+
+/// Create a new instance of a class.
+///
+/// Params:
+/// - klass: The class to create an instance of.
+///
+/// Returns:
+/// - ObjInstance*: A pointer to the new instance.
+ObjInstance*
+new_instance(ObjClass* klass);
 
 /// Check to see if the value is of the given object type.
 ///

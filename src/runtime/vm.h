@@ -6,6 +6,7 @@
 #pragma once
 
 #include "hash_map.h"
+#include "object.h"
 #include <stddef.h>
 
 #define FRAMES_MAX 1000

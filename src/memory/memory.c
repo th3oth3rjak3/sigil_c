@@ -86,6 +86,16 @@ free_object(Obj* object) {
             FREE(ObjString, object);
             break;
         }
+        case OBJ_CLASS: {
+            FREE(ObjClass, object);
+            break;
+        }
+        case OBJ_INSTANCE: {
+            ObjInstance* instance = (ObjInstance*)object;
+            free_hashmap(&instance->fields);
+            FREE(ObjInstance, object);
+            break;
+        }
     }
 }
 
@@ -170,6 +180,17 @@ blacken_object(Obj* object) {
 #endif
 
     switch (object->type) {
+        case OBJ_CLASS: {
+            ObjClass* klass = (ObjClass*)object;
+            mark_object((Obj*)klass->name);
+            break;
+        }
+        case OBJ_INSTANCE: {
+            ObjInstance* instance = (ObjInstance*)object;
+            mark_object((Obj*)instance->klass);
+            mark_hashmap(&instance->fields);
+            break;
+        }
         case OBJ_UPVALUE:
             mark_value(((ObjUpvalue*)object)->closed);
             break;

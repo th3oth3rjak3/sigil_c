@@ -105,6 +105,12 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return jump_instruction("OP_LOOP", -1, bytecode, offset);
         case OP_CALL:
             return word_instruction("OP_CALL", bytecode, offset);
+        case OP_CLASS:
+            return constant_instruction("OP_CLASS", bytecode, offset);
+        case OP_GET_PROPERTY:
+            return constant_instruction("OP_GET_PROPERTY", bytecode, offset);
+        case OP_SET_PROPERTY:
+            return constant_instruction("OP_SET_PROPERTY", bytecode, offset);
         case OP_CLOSURE: {
             offset++;
             uint16_t constant = bytecode->code[offset++];

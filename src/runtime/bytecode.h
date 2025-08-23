@@ -38,6 +38,9 @@ typedef enum {
     OP_CALL,          // Call a function
     OP_CLOSURE,       // Handle a closure.
     OP_CLOSE_UPVALUE, // Close an upvalue (move to heap).
+    OP_CLASS,         // Create a class.
+    OP_GET_PROPERTY,  // Get a class instance property.
+    OP_SET_PROPERTY,  // Set a class instance property.
     OP_RETURN,        // Return from function call.
 } OpCode;
 
