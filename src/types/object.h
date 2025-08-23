@@ -31,6 +31,9 @@
 // Determine if the object is a class.
 #define IS_CLASS(value) is_obj_type(value, OBJ_CLASS)
 
+// Determine if the object is a bound method.
+#define IS_BOUND_METHOD(value) is_obj_type(value, OBJ_BOUND_METHOD)
+
 // Convert the object to an ObjString type.
 #define AS_STRING(value) ((ObjString*)AS_OBJ(value))
 
@@ -52,16 +55,20 @@
 // Convert the object to a class instance.
 #define AS_INSTANCE(value) ((ObjInstance*)AS_OBJ(value))
 
+// Convert the object to a bound method.
+#define AS_BOUND_METHOD(value) ((ObjBoundMethod*)AS_OBJ(value))
+
 /// A tag to identify the different types of objects supported
 /// in the language.
 typedef enum {
-    OBJ_FUNCTION, // A function
-    OBJ_UPVALUE,  // A closure upvalue.
-    OBJ_CLOSURE,  // A function closure.
-    OBJ_NATIVE,   // A native C function.
-    OBJ_STRING,   // A string.
-    OBJ_CLASS,    // A class.
-    OBJ_INSTANCE, // A class instance.
+    OBJ_FUNCTION,     // A function
+    OBJ_UPVALUE,      // A closure upvalue.
+    OBJ_CLOSURE,      // A function closure.
+    OBJ_NATIVE,       // A native C function.
+    OBJ_STRING,       // A string.
+    OBJ_CLASS,        // A class.
+    OBJ_INSTANCE,     // A class instance.
+    OBJ_BOUND_METHOD, // A method bound to a class instance.
 } ObjType;
 
 /// An object instance.
@@ -122,8 +129,9 @@ typedef struct {
 
 /// A class definition.
 typedef struct {
-    Obj        obj;  // The object header.
-    ObjString* name; // The class name.
+    Obj        obj;     // The object header.
+    ObjString* name;    // The class name.
+    HashMap    methods; // A collection of methods.
 } ObjClass;
 
 /// An instance of a class.
@@ -132,6 +140,13 @@ typedef struct {
     ObjClass* klass;  // The class type.
     HashMap   fields; // A collection of fields and values.
 } ObjInstance;
+
+/// A method that is bound to an instance of a class.
+typedef struct {
+    Obj         obj;      // The object header.
+    Value       receiver; // An ObjInstance typed as Value.
+    ObjClosure* method;   // The method to call.
+} ObjBoundMethod;
 
 /// Create a new function.
 ///
@@ -218,6 +233,18 @@ new_class(ObjString* name);
 /// - ObjInstance*: A pointer to the new instance.
 ObjInstance*
 new_instance(ObjClass* klass);
+
+/// Create a new bound method.
+///
+/// Params:
+/// - receiver: The ObjInstance with the state used in the method, typed as a
+/// Value to prevent a bunch of unnecessary pointer casting.
+/// - method: The method to call on the receiver.
+///
+/// Returns:
+/// - ObjBoundMethod*: The pointer to the bound method.
+ObjBoundMethod*
+new_bound_method(Value receiver, ObjClosure* method);
 
 /// Check to see if the value is of the given object type.
 ///

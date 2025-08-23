@@ -87,6 +87,8 @@ free_object(Obj* object) {
             break;
         }
         case OBJ_CLASS: {
+            ObjClass* klass = (ObjClass*)object;
+            free_hashmap(&klass->methods);
             FREE(ObjClass, object);
             break;
         }
@@ -94,6 +96,10 @@ free_object(Obj* object) {
             ObjInstance* instance = (ObjInstance*)object;
             free_hashmap(&instance->fields);
             FREE(ObjInstance, object);
+            break;
+        }
+        case OBJ_BOUND_METHOD: {
+            FREE(ObjBoundMethod, object);
             break;
         }
     }
@@ -183,6 +189,7 @@ blacken_object(Obj* object) {
         case OBJ_CLASS: {
             ObjClass* klass = (ObjClass*)object;
             mark_object((Obj*)klass->name);
+            mark_hashmap(&klass->methods);
             break;
         }
         case OBJ_INSTANCE: {
@@ -206,6 +213,12 @@ blacken_object(Obj* object) {
             for (int i = 0; i < closure->upvalue_count; i++) {
                 mark_object((Obj*)closure->upvalues[i]);
             }
+            break;
+        }
+        case OBJ_BOUND_METHOD: {
+            ObjBoundMethod* bound = (ObjBoundMethod*)object;
+            mark_value(bound->receiver);
+            mark_object((Obj*)bound->method);
             break;
         }
         case OBJ_NATIVE:

@@ -111,6 +111,8 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return constant_instruction("OP_GET_PROPERTY", bytecode, offset);
         case OP_SET_PROPERTY:
             return constant_instruction("OP_SET_PROPERTY", bytecode, offset);
+        case OP_METHOD:
+            return constant_instruction("OP_METHOD", bytecode, offset);
         case OP_CLOSURE: {
             offset++;
             uint16_t constant = bytecode->code[offset++];

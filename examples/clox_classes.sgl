@@ -1,0 +1,8 @@
+class Bread {
+    bake(temp, minutes) {
+        print "baking bread at temperature " + temp + " degrees F for " + minutes + " minutes.";
+    }
+}
+
+var whiteBread = Bread();
+whiteBread.bake("350", "30");

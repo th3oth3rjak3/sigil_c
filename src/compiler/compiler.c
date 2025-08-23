@@ -303,6 +303,9 @@ static ParseRule*
 get_rule(TokenType type);
 
 static void
+named_variable(Token name, bool can_assign);
+
+static void
 parse_precedence(Precedence precedence) {
     advance();
     ParseFn prefix_rule = get_rule(parser.previous.type)->prefix;
@@ -532,16 +535,33 @@ function(FunctionType type) {
 }
 
 static void
+method() {
+    consume(TOKEN_IDENTIFIER, "Expect method name.");
+    uint16_t constant = identifier_constant(&parser.previous);
+
+    FunctionType type = TYPE_FUNCTION;
+    function(type);
+
+    emit_words(OP_METHOD, constant);
+}
+
+static void
 class_declaration() {
     consume(TOKEN_IDENTIFIER, "Expect class name.");
+    Token    class_name = parser.previous;
     uint16_t name_constant = identifier_constant(&parser.previous);
     declare_variable();
 
     emit_words(OP_CLASS, name_constant);
     define_variable(name_constant);
 
+    named_variable(class_name, false);
     consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
+    while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
+        method();
+    }
     consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
+    emit_word(OP_POP);
 }
 
 static void
