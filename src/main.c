@@ -96,12 +96,6 @@ main(int argc, const char* argv[]) {
         exit(64);
     }
 
-    // Free first, then report
     free_vm();
-
-#ifdef DEBUG_PRINT_ALLOCATIONS
-    report_memory_statistics();
-#endif
-
     return 0;
 }

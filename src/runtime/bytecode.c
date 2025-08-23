@@ -6,6 +6,7 @@
 #include "bytecode.h"
 #include "memory.h"
 #include "value.h"
+#include "vm.h"
 #include <stdint.h>
 #include <stdio.h>
 
@@ -44,6 +45,8 @@ write_bytecode(Bytecode* bytecode, uint16_t word, int line) {
 
 int
 write_constant(Bytecode* bytecode, Value value) {
+    push(value);
     write_value_array(&bytecode->constants, value);
+    pop();
     return bytecode->constants.count - 1;
 }

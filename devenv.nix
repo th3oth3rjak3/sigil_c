@@ -96,9 +96,6 @@ let
   
 in
 {
-  # Set environment variables
-  env.GREET = "devenv";
-
   # Install necessary packages
   packages = [
     pkgs.git

@@ -51,8 +51,9 @@ typedef enum {
 
 /// An object instance.
 struct Obj {
-    ObjType type; // The type of the object.
-    Obj*    next; // An intrusive list containing a pointer to the next object.
+    ObjType type;      // The type of the object.
+    bool    is_marked; // When true, marked as reachable by gc.
+    Obj*    next;      // An intrusive list. pointer to the next object.
 };
 
 /// A function that can be called.

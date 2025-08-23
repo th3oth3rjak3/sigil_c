@@ -6,6 +6,7 @@
 #pragma once
 
 #include "hash_map.h"
+#include <stddef.h>
 
 #define FRAMES_MAX 1000
 #define STACK_MAX (FRAMES_MAX * 1024)
@@ -30,10 +31,15 @@ typedef struct {
     int         frame_count;        // The number of call frames used.
     Value       stack[STACK_MAX];   // The virtual machine stack.
     Value*      stack_top;          // The pointer to the top of the stack.
-    Obj*        objects;       // The list of allocated objects on the heap.
-    HashMap     strings;       // The collection of interned strings.
-    ObjUpvalue* open_upvalues; // Upvalues that are still live in the stack.
-    HashMap     globals;       // The collection of global variables.
+    Obj*        objects;         // The list of allocated objects on the heap.
+    HashMap     strings;         // The collection of interned strings.
+    ObjUpvalue* open_upvalues;   // Upvalues that are still live in the stack.
+    HashMap     globals;         // The collection of global variables.
+    int         gray_count;      // The number of gray objects.
+    int         gray_capacity;   // The total amount of capacity.
+    Obj**       gray_stack;      // The gc worklist.
+    size_t      bytes_allocated; // Size of heap allocations by gc
+    size_t      next_gc;         // Threshold for next gc in bytes
 } VM;
 
 extern VM vm;

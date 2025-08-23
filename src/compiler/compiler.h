@@ -17,3 +17,7 @@
 /// - ObjFunction*: The compiled function.
 ObjFunction*
 compile(const char* source);
+
+/// Mark roots in the compiler code for GC.
+void
+mark_compiler_roots();

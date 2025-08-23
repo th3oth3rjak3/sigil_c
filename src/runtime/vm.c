@@ -171,8 +171,8 @@ is_falsey(Value value) {
 
 static void
 concatenate() {
-    const ObjString* b = AS_STRING(pop());
-    ObjString*       a = AS_STRING(pop());
+    const ObjString* b = AS_STRING(peek(0));
+    ObjString*       a = AS_STRING(peek(1));
 
     int   length = a->length + b->length;
     char* chars = ALLOCATE(char, length + 1);
@@ -181,6 +181,8 @@ concatenate() {
     chars[length] = '\0';
 
     ObjString* result = take_string(chars, length);
+    pop();
+    pop();
     push(OBJ_VAL(result));
 }
 
@@ -188,6 +190,14 @@ void
 init_vm() {
     reset_stack();
     vm.objects = NULL;
+
+    vm.gray_count = 0;
+    vm.gray_capacity = 0;
+    vm.gray_stack = NULL;
+
+    vm.bytes_allocated = 0;
+    vm.next_gc = 1024 * 1024;
+
     init_hashmap(&vm.globals);
     init_hashmap(&vm.strings);
 

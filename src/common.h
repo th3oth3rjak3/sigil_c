@@ -7,8 +7,9 @@
 
 #include <stdint.h>
 
-// #define DEBUG_PRINT_CODE
-// #define DEBUG_TRACE_EXECUTION
-// #define DEBUG_PRINT_ALLOCATIONS
+#define DEBUG_PRINT_CODE
+#define DEBUG_TRACE_EXECUTION
+#define DEBUG_STRESS_GC
+#define DEBUG_LOG_GC
 
 #define UINT16_COUNT (UINT16_MAX + 1)

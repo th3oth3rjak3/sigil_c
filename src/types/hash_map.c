@@ -155,3 +155,22 @@ hashmap_find_string(
         index = (index + 1) % hash_map->capacity;
     }
 }
+
+void
+mark_hashmap(HashMap* hash_map) {
+    for (int i = 0; i < hash_map->capacity; i++) {
+        Entry* entry = &hash_map->entries[i];
+        mark_object((Obj*)entry->key);
+        mark_value(entry->value);
+    }
+}
+
+void
+hashmap_remove_white(HashMap* hash_map) {
+    for (int i = 0; i < hash_map->capacity; i++) {
+        Entry* entry = &hash_map->entries[i];
+        if (entry->key != NULL && !entry->key->obj.is_marked) {
+            hashmap_delete(hash_map, entry->key);
+        }
+    }
+}

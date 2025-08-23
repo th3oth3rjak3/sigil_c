@@ -93,3 +93,17 @@ hashmap_copy_all(HashMap* source, HashMap* dest);
 ObjString*
 hashmap_find_string(
     HashMap* hash_map, const char* chars, int length, uint32_t hash);
+
+/// Mark the keys and values in the HashMap as reachable.
+///
+/// Params:
+/// - hash_map: The hash map which contains values to mark.
+void
+mark_hashmap(HashMap* hash_map);
+
+/// Remove all unreachable entries in the hash map.
+///
+/// Params:
+/// - hash_map: The hash map that needs the unreachable entries cleared.
+void
+hashmap_remove_white(HashMap* hash_map);
