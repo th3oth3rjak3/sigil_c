@@ -1,0 +1,26 @@
+class Vehicle {
+    init(name, wheels) {
+        this.name = name;
+        this.wheels = wheels;
+    }
+
+    drive() {
+        print "I'm a " + this.name + "!";
+        print "I have " + this.wheels + " wheels!";
+        print "vroom vroom!";
+    }
+}
+
+class Motorcycle < Vehicle {
+    init(name, wheels) {
+        super.init(name, wheels);
+    }
+
+    drive() {
+        super.drive();
+        print "Can't catch me coppers!";
+    }
+}
+
+var bike = Motorcycle("yamaha", 2);
+bike.drive();
