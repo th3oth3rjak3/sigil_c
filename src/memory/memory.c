@@ -166,6 +166,7 @@ mark_roots() {
 
     mark_hashmap(&vm.globals);
     mark_compiler_roots();
+    mark_object((Obj*)vm.init_string);
 
     for (int i = 0; i < vm.frame_count; i++) {
         mark_object((Obj*)vm.frames[i].closure);

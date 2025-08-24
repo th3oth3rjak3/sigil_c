@@ -42,6 +42,7 @@ typedef enum {
     OP_GET_PROPERTY,  // Get a class instance property.
     OP_SET_PROPERTY,  // Set a class instance property.
     OP_METHOD,        // Declare a class method.
+    OP_INVOKE,        // Invoke a method immediately.
     OP_RETURN,        // Return from function call.
 } OpCode;
 

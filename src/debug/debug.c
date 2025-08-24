@@ -38,6 +38,16 @@ constant_instruction(const char* name, Bytecode* bytecode, int offset) {
     return offset + 2;
 }
 
+static int
+invoke_instruction(const char* name, Bytecode* bytecode, int offset) {
+    uint16_t constant = bytecode->code[offset + 1];
+    uint16_t arg_count = bytecode->code[offset + 2];
+    printf("%-16s (%d args) %4d '", name, arg_count, constant);
+    print_value(bytecode->constants.values[constant]);
+    printf("'\n");
+    return offset + 3;
+}
+
 void
 disassemble_bytecode(Bytecode* bytecode, const char* name) {
     printf("== %s ==\n", name);
@@ -113,6 +123,8 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return constant_instruction("OP_SET_PROPERTY", bytecode, offset);
         case OP_METHOD:
             return constant_instruction("OP_METHOD", bytecode, offset);
+        case OP_INVOKE:
+            return invoke_instruction("OP_INVOKE", bytecode, offset);
         case OP_CLOSURE: {
             offset++;
             uint16_t constant = bytecode->code[offset++];

@@ -101,3 +101,6 @@ free_value_array(ValueArray* array);
 /// - value: The value to print.
 void
 print_value(Value value);
+
+ObjString*
+number_to_string(double value);

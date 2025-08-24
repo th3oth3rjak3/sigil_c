@@ -60,8 +60,10 @@ typedef struct {
 
 /// Represents various types of functions.
 typedef enum {
-    TYPE_FUNCTION, // A regular function.
-    TYPE_SCRIPT    // A top-level function
+    TYPE_FUNCTION,    // A regular function.
+    TYPE_SCRIPT,      // A top-level function
+    TYPE_METHOD,      // A class method.
+    TYPE_INITIALIZER, // A class instance initializer.
 } FunctionType;
 
 /// Represents a captured value in a closure.
@@ -81,11 +83,18 @@ typedef struct Compiler {
     int              scope_depth; // How many blocks are surrounding this code.
 } Compiler;
 
+typedef struct ClassCompiler {
+    struct ClassCompiler* enclosing;
+} ClassCompiler;
+
 /// The global parser.
 Parser parser;
 
 /// The current global compiler.
 Compiler* current = NULL;
+
+/// The current global class compiler.
+ClassCompiler* current_class = NULL;
 
 /// The currently compiling bytecode segment.
 Bytecode* compiling_bytecode;
@@ -239,13 +248,24 @@ init_compiler(Compiler* compiler, FunctionType type) {
 
     Local* local = &current->locals[current->local_count++];
     local->depth = 0;
-    local->name.start = "";
-    local->name.length = 0;
+    local->is_captured = false;
+    if (type != TYPE_FUNCTION) {
+        local->name.start = "this";
+        local->name.length = 4;
+    } else {
+        local->name.start = "";
+        local->name.length = 0;
+    }
 }
 
 static void
 emit_return() {
-    emit_word(OP_NIL);
+    if (current->type == TYPE_INITIALIZER) {
+        emit_words(OP_GET_LOCAL, 0);
+    } else {
+        emit_word(OP_NIL);
+    }
+
     emit_word(OP_RETURN);
 }
 
@@ -539,7 +559,13 @@ method() {
     consume(TOKEN_IDENTIFIER, "Expect method name.");
     uint16_t constant = identifier_constant(&parser.previous);
 
-    FunctionType type = TYPE_FUNCTION;
+    FunctionType type = TYPE_METHOD;
+
+    if (parser.previous.length == 4
+        && memcmp(parser.previous.start, "init", 4) == 0) {
+        type = TYPE_INITIALIZER;
+    }
+
     function(type);
 
     emit_words(OP_METHOD, constant);
@@ -555,6 +581,10 @@ class_declaration() {
     emit_words(OP_CLASS, name_constant);
     define_variable(name_constant);
 
+    ClassCompiler class_compiler;
+    class_compiler.enclosing = current_class;
+    current_class = &class_compiler;
+
     named_variable(class_name, false);
     consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
     while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF)) {
@@ -562,6 +592,8 @@ class_declaration() {
     }
     consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
     emit_word(OP_POP);
+
+    current_class = current_class->enclosing;
 }
 
 static void
@@ -677,6 +709,10 @@ return_statement() {
     if (match(TOKEN_SEMICOLON)) {
         emit_return();
     } else {
+        if (current->type == TYPE_INITIALIZER) {
+            error("Can't return a value from an initializer.");
+        }
+
         expression();
         consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
         emit_word(OP_RETURN);
@@ -822,6 +858,16 @@ variable(bool can_assign) {
 }
 
 static void
+this_(bool can_assign) {
+    if (current_class == NULL) {
+        error("Can't use 'this' outside of a class.");
+        return;
+    }
+
+    variable(false);
+}
+
+static void
 unary(bool can_assign) {
     TokenType operatorType = parser.previous.type;
 
@@ -897,6 +943,10 @@ dot(bool can_assign) {
     if (can_assign && match(TOKEN_EQUAL)) {
         expression();
         emit_words(OP_SET_PROPERTY, name);
+    } else if (match(TOKEN_LEFT_PAREN)) {
+        uint16_t arg_count = argument_list();
+        emit_words(OP_INVOKE, name);
+        emit_word(arg_count);
     } else {
         emit_words(OP_GET_PROPERTY, name);
     }
@@ -954,7 +1004,7 @@ ParseRule rules[] = {
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
     [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
     [TOKEN_SUPER] = {NULL, NULL, PREC_NONE},
-    [TOKEN_THIS] = {NULL, NULL, PREC_NONE},
+    [TOKEN_THIS] = {this_, NULL, PREC_NONE},
     [TOKEN_TRUE] = {literal, NULL, PREC_NONE},
     [TOKEN_VAR] = {NULL, NULL, PREC_NONE},
     [TOKEN_WHILE] = {NULL, NULL, PREC_NONE},

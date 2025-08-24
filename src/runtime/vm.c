@@ -125,10 +125,21 @@ call_value(Value callee, int arg_count) {
             case OBJ_CLASS: {
                 ObjClass* klass = AS_CLASS(callee);
                 vm.stack_top[-arg_count - 1] = OBJ_VAL(new_instance(klass));
+                Value initializer;
+                if (hashmap_get(
+                        &klass->methods, vm.init_string, &initializer)) {
+                    return call(AS_CLOSURE(initializer), arg_count);
+                } else if (arg_count != 0) {
+                    runtime_error(
+                        "Expected 0 arguments but got %d.", arg_count);
+                    return false;
+                }
+
                 return true;
             }
             case OBJ_BOUND_METHOD: {
                 ObjBoundMethod* bound = AS_BOUND_METHOD(callee);
+                vm.stack_top[-arg_count - 1] = bound->receiver;
                 return call(bound->method, arg_count);
             }
             default:
@@ -137,6 +148,37 @@ call_value(Value callee, int arg_count) {
     }
     runtime_error("Can only call functions and classes.");
     return false;
+}
+
+static bool
+invoke_from_class(ObjClass* klass, ObjString* name, int arg_count) {
+    Value method;
+    if (!hashmap_get(&klass->methods, name, &method)) {
+        runtime_error("Undefined property '%s'.", name->chars);
+        return false;
+    }
+
+    return call(AS_CLOSURE(method), arg_count);
+}
+
+static bool
+invoke(ObjString* name, int arg_count) {
+    Value receiver = peek(arg_count);
+
+    if (!IS_INSTANCE(receiver)) {
+        runtime_error("Only instances have methods.");
+        return false;
+    }
+
+    ObjInstance* instance = AS_INSTANCE(receiver);
+
+    Value value;
+    if (hashmap_get(&instance->fields, name, &value)) {
+        vm.stack_top[-arg_count - 1] = value;
+        return call_value(value, arg_count);
+    }
+
+    return invoke_from_class(instance->klass, name, arg_count);
 }
 
 static bool
@@ -201,21 +243,77 @@ is_falsey(Value value) {
     return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
 }
 
+// static void
+// concatenate() {
+//     const ObjString* b = AS_STRING(peek(0));
+//     ObjString*       a = AS_STRING(peek(1));
+
+//     int   length = a->length + b->length;
+//     char* chars = ALLOCATE(char, length + 1);
+//     memcpy(chars, a->chars, a->length);
+//     memcpy(chars + a->length, b->chars, b->length);
+//     chars[length] = '\0';
+
+//     ObjString* result = take_string(chars, length);
+//     pop();
+//     pop();
+//     push(OBJ_VAL(result));
+// }
+
 static void
 concatenate() {
-    const ObjString* b = AS_STRING(peek(0));
-    ObjString*       a = AS_STRING(peek(1));
+    Value b_val = peek(0);
+    Value a_val = peek(1);
 
-    int   length = a->length + b->length;
-    char* chars = ALLOCATE(char, length + 1);
-    memcpy(chars, a->chars, a->length);
-    memcpy(chars + a->length, b->chars, b->length);
-    chars[length] = '\0';
+    // Convert numbers to strings if needed
+    if (IS_NUMBER(a_val) || IS_NUMBER(b_val)) {
+        ObjString* a_str = NULL;
+        ObjString* b_str = NULL;
 
-    ObjString* result = take_string(chars, length);
-    pop();
-    pop();
-    push(OBJ_VAL(result));
+        // Convert first operand if it's a number
+        if (IS_NUMBER(a_val)) {
+            a_str = number_to_string(AS_NUMBER(a_val));
+        } else {
+            a_str = AS_STRING(a_val);
+        }
+
+        // Convert second operand if it's a number
+        if (IS_NUMBER(b_val)) {
+            b_str = number_to_string(AS_NUMBER(b_val));
+        } else {
+            b_str = AS_STRING(b_val);
+        }
+
+        // Concatenate the strings
+        int   length = a_str->length + b_str->length;
+        char* chars = ALLOCATE(char, length + 1);
+        memcpy(chars, a_str->chars, a_str->length);
+        memcpy(chars + a_str->length, b_str->chars, b_str->length);
+        chars[length] = '\0';
+
+        ObjString* result = take_string(chars, length);
+
+        pop(); // pop b
+        pop(); // pop a
+        push(OBJ_VAL(result));
+    } else if (IS_STRING(a_val) && IS_STRING(b_val)) {
+        // Original string concatenation logic
+        const ObjString* b = AS_STRING(peek(0));
+        ObjString*       a = AS_STRING(peek(1));
+
+        int   length = a->length + b->length;
+        char* chars = ALLOCATE(char, length + 1);
+        memcpy(chars, a->chars, a->length);
+        memcpy(chars + a->length, b->chars, b->length);
+        chars[length] = '\0';
+
+        ObjString* result = take_string(chars, length);
+        pop();
+        pop();
+        push(OBJ_VAL(result));
+    } else {
+        runtime_error("Operands must be two numbers or two strings.");
+    }
 }
 
 void
@@ -233,6 +331,9 @@ init_vm() {
     init_hashmap(&vm.globals);
     init_hashmap(&vm.strings);
 
+    vm.init_string = NULL;
+    vm.init_string = copy_string("init", 4);
+
     define_native("clock", clock_native);
 }
 
@@ -240,6 +341,7 @@ void
 free_vm() {
     free_hashmap(&vm.globals);
     free_hashmap(&vm.strings);
+    vm.init_string = NULL;
     free_objects();
 }
 
@@ -354,6 +456,10 @@ run() {
                 break;
             case OP_ADD: {
                 if (IS_STRING(peek(0)) && IS_STRING(peek(1))) {
+                    concatenate();
+                } else if (IS_NUMBER(peek(0)) && IS_STRING(peek(1))) {
+                    concatenate();
+                } else if (IS_STRING(peek(0)) && IS_NUMBER(peek(1))) {
                     concatenate();
                 } else if (IS_NUMBER(peek(0)) && IS_NUMBER(peek(1))) {
                     double b = AS_NUMBER(pop());
@@ -480,6 +586,16 @@ run() {
             }
             case OP_METHOD: {
                 define_method(READ_STRING());
+                break;
+            }
+            case OP_INVOKE: {
+                ObjString* method = READ_STRING();
+                int        arg_count = READ_WORD();
+                if (!invoke(method, arg_count)) {
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                frame = &vm.frames[vm.frame_count - 1];
                 break;
             }
             case OP_RETURN: {

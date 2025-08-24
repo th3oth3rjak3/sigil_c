@@ -1,8 +1,18 @@
 class Bread {
-    bake(temp, minutes) {
-        print "baking bread at temperature " + temp + " degrees F for " + minutes + " minutes.";
+    init(name, cookingTemperature, cookingDuration) {
+        this.name = name;
+        this.cookingTemperature = cookingTemperature;
+        this.cookingDuration = cookingDuration;
+    }
+
+    bake() {
+        var bakeMessage =  "baking " + this.name + " at temperature ";
+        bakeMessage = bakeMessage + this.cookingTemperature + " degrees F for ";
+        bakeMessage = bakeMessage + this.cookingDuration + " minutes.";
+
+        print bakeMessage;
     }
 }
 
-var whiteBread = Bread();
-whiteBread.bake("350", "30");
+var whiteBread = Bread("yummy white bread", 350, 30);
+whiteBread.bake();

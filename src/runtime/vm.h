@@ -41,6 +41,7 @@ typedef struct {
     Obj**       gray_stack;      // The gc worklist.
     size_t      bytes_allocated; // Size of heap allocations by gc
     size_t      next_gc;         // Threshold for next gc in bytes
+    ObjString*  init_string;     // An interned string for the init method name.
 } VM;
 
 extern VM vm;
