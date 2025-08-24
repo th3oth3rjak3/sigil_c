@@ -598,6 +598,37 @@ run() {
                 frame = &vm.frames[vm.frame_count - 1];
                 break;
             }
+            case OP_INHERIT: {
+                Value superclass = peek(1);
+                if (!IS_CLASS(superclass)) {
+                    runtime_error("Superclass must be a class.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                ObjClass* subclass = AS_CLASS(peek(0));
+                hashmap_copy_all(
+                    &AS_CLASS(superclass)->methods, &subclass->methods);
+                pop(); // remove subclass
+                break;
+            }
+            case OP_GET_SUPER: {
+                ObjString* name = READ_STRING();
+                ObjClass*  superclass = AS_CLASS(pop());
+
+                if (!bind_method(superclass, name)) {
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }
+            case OP_SUPER_INVOKE: {
+                ObjString* method = READ_STRING();
+                int        arg_count = READ_WORD();
+                ObjClass*  superclass = AS_CLASS(pop());
+                if (!invoke_from_class(superclass, method, arg_count)) {
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                frame = &vm.frames[vm.frame_count - 1];
+                break;
+            }
             case OP_RETURN: {
                 Value result = pop();
                 close_upvalues(frame->slots);

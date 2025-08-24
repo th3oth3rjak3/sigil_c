@@ -125,6 +125,12 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
             return constant_instruction("OP_METHOD", bytecode, offset);
         case OP_INVOKE:
             return invoke_instruction("OP_INVOKE", bytecode, offset);
+        case OP_INHERIT:
+            return simple_instruction("OP_INHERIT", offset);
+        case OP_GET_SUPER:
+            return constant_instruction("OP_GET_SUPER", bytecode, offset);
+        case OP_SUPER_INVOKE:
+            return invoke_instruction("OP_SUPER_INVOKE", bytecode, offset);
         case OP_CLOSURE: {
             offset++;
             uint16_t constant = bytecode->code[offset++];

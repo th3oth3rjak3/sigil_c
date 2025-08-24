@@ -78,15 +78,15 @@ adjust_capacity(HashMap* hash_map, int capacity) {
     hash_map->capacity = capacity;
 }
 
-// void
-// hashmap_copy_all(HashMap* source, HashMap* dest) {
-//     for (int i = 0; i < source->capacity; i++) {
-//         Entry* entry = &source->entries[i];
-//         if (entry->key != NULL) {
-//             hashmap_set(dest, entry->key, entry->value);
-//         }
-//     }
-// }
+void
+hashmap_copy_all(HashMap* source, HashMap* dest) {
+    for (int i = 0; i < source->capacity; i++) {
+        Entry* entry = &source->entries[i];
+        if (entry->key != NULL) {
+            hashmap_set(dest, entry->key, entry->value);
+        }
+    }
+}
 
 bool
 hashmap_set(HashMap* hash_map, ObjString* key, Value value) {
