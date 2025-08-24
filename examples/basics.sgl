@@ -3,3 +3,5 @@ b = 20;
 c = a + b;
 
 print("Sum:", c);  // Sum: 30
+
+print(1_000_000);

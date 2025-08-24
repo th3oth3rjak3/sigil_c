@@ -197,15 +197,15 @@ identifier_type() {
 
 static Token
 number() {
-    while (is_digit(peek()))
+    while (is_digit(peek()) || peek() == '_')
         advance();
 
     // Look for a fractional part.
-    if (peek() == '.' && is_digit(peek_next())) {
+    if (peek() == '.' && (is_digit(peek_next()) || peek_next() == '_')) {
         // Consume the ".".
         advance();
 
-        while (is_digit(peek()))
+        while (is_digit(peek()) || peek() == '_')
             advance();
     }
 

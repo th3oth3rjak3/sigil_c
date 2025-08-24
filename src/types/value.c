@@ -45,9 +45,11 @@ print_value(Value value) {
         case VAL_NIL:
             printf("nil");
             break;
-        case VAL_NUMBER:
-            printf("%g", AS_NUMBER(value));
+        case VAL_NUMBER: {
+            ObjString* str = number_to_string(AS_NUMBER(value));
+            printf("%s", str->chars);
             break;
+        }
         case VAL_OBJ:
             print_object(value);
             break;
@@ -110,7 +112,7 @@ number_to_string(double value) {
         }
     }
 
-    // Add commas to integer part (every 3 digits)
+    // Add commas to integer part (every 3 digits from right)
     int comma_count = (integer_digits - 1) / 3;
     int total_integer_chars =
         integer_digits + comma_count + (is_negative ? 1 : 0);
@@ -161,7 +163,7 @@ number_to_string(double value) {
         result_buf[pos++] = '-';
     }
 
-    // Convert integer part to string with commas
+    // Convert integer part to string with commas (fixed logic)
     if (integer_part == 0) {
         result_buf[pos++] = '0';
     } else {
@@ -169,15 +171,23 @@ number_to_string(double value) {
         snprintf(integer_buf, sizeof(integer_buf), "%lld", integer_part);
 
         int len = strlen(integer_buf);
-        int digit_count = 0;
 
-        for (int i = 0; i < len; i++) {
+        // Calculate where commas should be placed
+        int first_group_size = len % 3;
+        if (first_group_size == 0) {
+            first_group_size = 3;
+        }
+
+        // Add first group of digits
+        for (int i = 0; i < first_group_size; i++) {
             result_buf[pos++] = integer_buf[i];
-            digit_count++;
+        }
 
-            // Add comma after every 3 digits, but not at the end
-            if ((len - i - 1) > 0 && digit_count % 3 == 0) {
-                result_buf[pos++] = ',';
+        // Add remaining groups with commas
+        for (int i = first_group_size; i < len; i += 3) {
+            result_buf[pos++] = ',';
+            for (int j = 0; j < 3 && (i + j) < len; j++) {
+                result_buf[pos++] = integer_buf[i + j];
             }
         }
     }

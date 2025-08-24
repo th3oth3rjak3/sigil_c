@@ -832,7 +832,19 @@ grouping(bool can_assign) {
 
 static void
 number(bool can_assign) {
-    double value = strtod(parser.previous.start, NULL);
+    char buf[parser.previous.length + 1];
+    int  cur = 0;
+    for (int i = 0; i < parser.previous.length; i++) {
+        char current = parser.previous.start[i];
+        if (current != '_') {
+            buf[cur] = current;
+            cur++;
+        }
+    }
+
+    buf[cur] = '\0';
+
+    double value = strtod(buf, NULL);
     emit_constant(NUMBER_VAL(value));
 }
 
