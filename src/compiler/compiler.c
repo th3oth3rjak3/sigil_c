@@ -600,14 +600,13 @@ class_declaration() {
         if (identifiers_equal(&class_name, &parser.previous)) {
             error("A class can't inherit from itself.");
         }
+        begin_scope();
+        add_local(synthetic_token("super"));
+        define_variable(0);
         named_variable(class_name, false);
         emit_word(OP_INHERIT);
         class_compiler.has_super_class = true;
     }
-
-    begin_scope();
-    add_local(synthetic_token("super"));
-    define_variable(0);
 
     named_variable(class_name, false);
     consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
@@ -626,7 +625,7 @@ class_declaration() {
 
 static void
 fun_declaration() {
-    uint8_t global = parse_variable("Expect function name.");
+    uint16_t global = parse_variable("Expect function name.");
     mark_initialized();
     function(TYPE_FUNCTION);
     define_variable(global);

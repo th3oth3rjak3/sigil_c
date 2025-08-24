@@ -31,7 +31,7 @@ jump_instruction(const char* name, int sign, Bytecode* bytecode, int offset) {
 
 static int
 constant_instruction(const char* name, Bytecode* bytecode, int offset) {
-    uint8_t constant = bytecode->code[offset + 1];
+    uint16_t constant = bytecode->code[offset + 1];
     printf("%-16s %4d '", name, constant);
     print_value(bytecode->constants.values[constant]);
     printf("'\n");
@@ -65,7 +65,7 @@ disassemble_instruction(Bytecode* bytecode, int offset) {
     } else {
         printf("%4d ", bytecode->lines[offset]);
     }
-    uint8_t instruction = bytecode->code[offset];
+    uint16_t instruction = bytecode->code[offset];
     switch (instruction) {
         case OP_CONSTANT:
             return constant_instruction("OP_CONSTANT", bytecode, offset);

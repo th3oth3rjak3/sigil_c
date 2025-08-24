@@ -378,7 +378,7 @@ run() {
             (int)(frame->ip - frame->closure->function->bytecode.code));
 #endif
 
-        uint8_t instruction;
+        uint16_t instruction;
         switch (instruction = READ_WORD()) {
             case OP_CONSTANT: {
                 Value constant = READ_CONSTANT();
