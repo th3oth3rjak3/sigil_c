@@ -327,6 +327,12 @@ static void
 named_variable(Token name, bool can_assign);
 
 static void
+variable(bool can_assign);
+
+static Token
+synthetic_token(const char* text);
+
+static void
 parse_precedence(Precedence precedence) {
     advance();
     ParseFn prefix_rule = get_rule(parser.previous.type)->prefix;
