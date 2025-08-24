@@ -26,7 +26,7 @@ free_hashmap(HashMap* hash_map) {
 
 static Entry*
 find_entry(Entry* entries, int capacity, const ObjString* key) {
-    uint32_t index = key->hash % capacity;
+    uint32_t index = key->hash & (capacity - 1);
     Entry*   tombstone = NULL;
 
     for (;;) {
@@ -45,7 +45,7 @@ find_entry(Entry* entries, int capacity, const ObjString* key) {
             return entry;
         }
 
-        index = (index + 1) % capacity;
+        index = (index + 1) & (capacity - 1);
     }
 }
 
@@ -139,7 +139,7 @@ hashmap_find_string(
         return NULL;
     }
 
-    uint32_t index = hash % hash_map->capacity;
+    uint32_t index = hash & (hash_map->capacity - 1);
     for (;;) {
         Entry* entry = &hash_map->entries[index];
         if (entry->key == NULL) {
@@ -153,7 +153,7 @@ hashmap_find_string(
             return entry->key;
         }
 
-        index = (index + 1) % hash_map->capacity;
+        index = (index + 1) & (hash_map->capacity - 1);
     }
 }
 
