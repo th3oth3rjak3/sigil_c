@@ -46,13 +46,13 @@ target_include_directories(sigil PRIVATE
 
 # Try AddressSanitizer with simpler flags
 target_compile_options(sigil PRIVATE 
-    -fsanitize=address 
+    # -fsanitize=address 
     -g
     -fno-omit-frame-pointer
 )
 
 target_link_options(sigil PRIVATE 
-    -fsanitize=address
+    # -fsanitize=address
 )
 
 if(WIN32)
@@ -66,4 +66,4 @@ else()
     message(STATUS "Unix: Set stack to 8MB")
 endif()
 
-message(STATUS "Building with AddressSanitizer")
+# message(STATUS "Building with AddressSanitizer")
