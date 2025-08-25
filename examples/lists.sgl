@@ -1,0 +1,82 @@
+class Node {
+    init(value) {
+        this.value = value;
+        this.next = nil;
+    }
+}
+
+class List {
+    init() {
+        this.head = nil;
+    }
+
+    push(value) {
+        var previous = nil;
+        var current = this.head;
+
+        while (current != nil) {
+            previous = current;
+            current = current.next;
+        }
+
+        // Current should be nil at this point
+        if (previous == nil or previous.value == nil) {
+            this.head = Node(value);
+        } else {
+            previous.next = Node(value);
+        }
+    }
+
+    pop() {
+        if (this.head == nil) {
+            return nil;
+        }
+        
+        if (this.head != nil and this.head.next == nil) {
+            var value = this.head.value;
+            this.head = nil;
+            return value;
+        }
+
+        var previous = nil;
+        var current = this.head;
+
+        while (current != nil and current.next != nil) {
+            previous = current;
+            current = current.next;
+        }
+
+        // Previous and Current are non-nil and current.next is nil
+        previous.next = nil;
+        return current.value;
+    }
+
+    write() {
+        var current = this.head;
+        
+        print "[";
+
+        while (current != nil) {
+            print current.value;
+            current = current.next;
+            if (current != nil) {
+                print ", ";
+            }
+        }
+
+        print "]";
+    }
+}
+
+var nums = List();
+nums.push(1);
+nums.push(2);
+nums.push(3);
+nums.write();
+var three = nums.pop();
+var two = nums.pop();
+var one = nums.pop();
+print one;
+print two;
+print three;
+nums.write();
