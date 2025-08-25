@@ -38,8 +38,8 @@ class List {
             return value;
         }
 
-        var previous = nil;
         var current = this.head;
+        var previous = this.head.next;
 
         while (current != nil and current.next != nil) {
             previous = current;
@@ -54,17 +54,18 @@ class List {
     write() {
         var current = this.head;
         
-        print "[";
+        print("[");
 
         while (current != nil) {
-            print current.value;
+            print(current.value);
             current = current.next;
             if (current != nil) {
-                print ", ";
+                print(", ");
             }
         }
 
-        print "]";
+        print("]");
+        println();
     }
 }
 
@@ -76,7 +77,7 @@ nums.write();
 var three = nums.pop();
 var two = nums.pop();
 var one = nums.pop();
-print one;
-print two;
-print three;
+println(one);
+println(two);
+println(three);
 nums.write();

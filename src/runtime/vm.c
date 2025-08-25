@@ -26,6 +26,27 @@ clock_native(int arg_count, Value* args) {
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
 
+static Value
+println_native(int arg_count, Value* args) {
+    if (arg_count == 0) {
+        printf("\n");
+        return NIL_VAL;
+    }
+
+    print_value(args[0]);
+    printf("\n");
+    return NIL_VAL;
+}
+
+static Value
+print_native(int arg_count, Value* args) {
+    if (arg_count == 0)
+        return NIL_VAL;
+
+    print_value(args[0]);
+    return NIL_VAL;
+}
+
 static void
 reset_stack() {
     vm.stack_top = vm.stack;
@@ -335,6 +356,8 @@ init_vm() {
     vm.init_string = copy_string("init", 4);
 
     define_native("clock", clock_native);
+    define_native("print", print_native);
+    define_native("println", println_native);
 }
 
 void
